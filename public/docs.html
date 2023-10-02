@@ -1,0 +1,435 @@
+<h1>Web5 JS SDK</h1>
+<p><a href="https://www.npmjs.com/package/@tbd54566975/web5"><img src="https://img.shields.io/npm/v/@tbd54566975/web5.svg?style=flat-square&amp;logo=npm&amp;logoColor=FFFFFF&amp;color=FFEC19&amp;santize=true" alt="NPM"></a>
+<a href="https://github.com/TBD54566975/web5-js/actions/workflows/tests-ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/TBD54566975/web5-js/tests-ci.yml?branch=main&amp;logo=github&amp;label=ci&amp;logoColor=FFFFFF&amp;style=flat-square" alt="Build Status"></a>
+<a href="https://codecov.io/github/TBD54566975/web5-js"><img src="https://img.shields.io/codecov/c/gh/frankhinek/test-web5-js/main?logo=codecov&amp;logoColor=FFFFFF&amp;style=flat-square&amp;token=YI87CKF1LI" alt="Coverage"></a>
+<a href="https://github.com/TBD54566975/web5-js/blob/main/LICENSE"><img src="https://img.shields.io/npm/l/@tbd54566975/web5.svg?style=flat-square&amp;color=24f2ff&amp;logo=apache&amp;logoColor=FFFFFF&amp;santize=true" alt="License"></a>
+<a href="https://discord.com/channels/937858703112155166/969272658501976117"><img src="https://img.shields.io/badge/chat-on%20discord-7289da.svg?style=flat-square&amp;color=9a1aff&amp;logo=discord&amp;logoColor=FFFFFF&amp;sanitize=true" alt="Chat"></a></p>
+<p>Making developing with Web5 components at least 5 times easier to work with.</p>
+<blockquote>
+<p>⚠️ WEB5 JS SDK IS CURRENTLY IN TECH PREVIEW ⚠️</p>
+</blockquote>
+<p>The SDK is currently still under active development, but having entered the Tech Preview phase there is now a drive to avoid unnecessary changes unless backwards compatibility is provided. Additional functionality will be added in the lead up to 1.0 final, and modifications will be made to address issues and community feedback.</p>
+<h2>Table of Contents</h2>
+<ul>
+<li><a href="#introduction">Introduction</a></li>
+<li><a href="#installation">Installation</a></li>
+<li><a href="#usage">Usage</a></li>
+<li><a href="#api-documentation">API Documentation</a>
+<ul>
+<li><a href="#web5connectoptions">Web5.connect</a></li>
+<li><a href="#web5dwnrecordsqueryrequest">web5.dwn.records.query</a></li>
+<li><a href="#web5dwnrecordscreaterequest">web5.dwn.records.create</a></li>
+<li><a href="#web5dwnrecordswriterequest">web5.dwn.records.write</a></li>
+<li><a href="#web5dwnrecordsreadrequest">web5.dwn.records.read</a></li>
+<li><a href="#web5dwnrecordsdeleterequest">web5.dwn.records.delete</a></li>
+<li><a href="#web5dwnprotocolsconfigurerequest">web5.dwn.protocols.configure</a></li>
+<li><a href="#web5dwnprotocolsqueryrequest">web5.dwn.protocols.query</a></li>
+<li><a href="#web5didcreatemethod-options">web5.did.create</a></li>
+</ul>
+</li>
+<li><a href="#project-resources">Project Resources</a></li>
+</ul>
+<h2>Introduction</h2>
+<p>Web5 consists of the following components:</p>
+<ul>
+<li>Decentralized Identifiers</li>
+<li>Verifiable Credentials</li>
+<li>DWeb Node personal datastores</li>
+</ul>
+<p>The SDK sets out to gather the most oft used functionality from all three of these
+pillar technologies to provide a simple library that is as close to effortless as
+possible.</p>
+<h2>Installation</h2>
+<p><em>NPM</em></p>
+<pre><code class="language-yaml">npm install @tbd54566975/web5
+</code></pre>
+<p><em>CDNs</em></p>
+<pre><code class="language-yaml">https://unpkg.com/@tbd54566975/web5@0.7.11/dist/browser.js
+</code></pre>
+<pre><code class="language-yaml">https://cdn.jsdelivr.net/npm/@tbd54566975/web5@0.7.11/dist/browser.mjs
+</code></pre>
+<h2>Usage</h2>
+<h3>Importing the SDK</h3>
+<pre><code class="language-javascript">import { Web5 } from &quot;@tbd54566975/web5&quot;;
+</code></pre>
+<p>or</p>
+<pre><code class="language-javascript">import { Web5 } from CDN_LINK_HERE;
+</code></pre>
+<h3>Additional Steps</h3>
+<p>This SDK relies indirectly on the <a href="https://github.com/paulmillr/noble-ed25519#usage"><code>@noble/ed25519</code></a>
+and <a href="https://github.com/paulmillr/noble-secp256k1#usage"><code>@noble/secp256k1</code></a> packages. Therefore,
+in certain environments, you'll need to perform additional steps to make it work.</p>
+<ul>
+<li>Node.js &lt;= 18</li>
+</ul>
+<pre><code class="language-js">// node.js 18 and earlier,  needs globalThis.crypto polyfill
+import { webcrypto } from &quot;node:crypto&quot;;
+// @ts-ignore
+if (!globalThis.crypto) globalThis.crypto = webcrypto;
+</code></pre>
+<ul>
+<li>React Native:</li>
+</ul>
+<pre><code class="language-js">// If you're on react native. React Native needs crypto.getRandomValues polyfill and sha512
+import &quot;react-native-get-random-values&quot;;
+import { hmac } from &quot;@noble/hashes/hmac&quot;;
+import { sha256 } from &quot;@noble/hashes/sha256&quot;;
+import { sha512 } from &quot;@noble/hashes/sha512&quot;;
+ed.etc.sha512Sync = (...m) =&gt; sha512(ed.etc.concatBytes(...m));
+ed.etc.sha512Async = (...m) =&gt; Promise.resolve(ed.etc.sha512Sync(...m));
+
+secp.etc.hmacSha256Sync = (k, ...m) =&gt;
+  hmac(sha256, k, secp.etc.concatBytes(...m));
+secp.etc.hmacSha256Async = (k, ...m) =&gt;
+  Promise.resolve(secp.etc.hmacSha256Sync(k, ...m));
+</code></pre>
+<h2>API Documentation</h2>
+<h3><strong><code>Web5.connect(options)</code></strong></h3>
+<p>Enables an app to request connection to a user's local identity app (like a desktop or mobile agent - work is underway for reference apps of each), or generate an in-app DID to represent the user (e.g. if the user does not have an identity app).</p>
+<blockquote>
+<p><strong>NOTE:</strong> The outputs of this method invocation will be used throughout the other API methods below.</p>
+</blockquote>
+<pre><code class="language-javascript">const { web5, did: myDid } = await Web5.connect();
+</code></pre>
+<h4><strong><code>options</code></strong> <em>(optional)</em></h4>
+<p>An object which may specify any of the following properties:</p>
+<ul>
+<li>
+<p><strong><code>techPreview</code></strong> - <em><code>object</code></em> <em>(optional)</em>: an object that specifies configuration parameters that are relevant during the Tech Preview period of Web5 JS and may be deprecated in the future with advance notice.</p>
+<ul>
+<li><strong><code>dwnEndpoints</code></strong> - <em><code>array</code></em> <em>(optional)</em>: a list of DWeb Node endpoints to define in the DID created and returned by <code>Web5.connect()</code>. If this property is omitted, during the Tech Preview two nodes will be included by default (e.g., <code>['https://dwn.tbddev.org/dwn0', 'https://dwn.tbddev.org/dwn3']</code>).</li>
+</ul>
+<p>For example:</p>
+<pre><code class="language-typescript">const { web5, did: myDid } = await Web5.connect({
+  techPreview: {
+    dwnEndpoints: [&quot;https://dwn.your-domain.org/&quot;],
+  },
+});
+</code></pre>
+</li>
+</ul>
+<p>&lt;!-- &gt; NOTE: This method <strong><em>MUST</em></strong> be invoked within the scope of a 'trusted user action' (something enforced by the OS/browser) if the desire is to connect to a local identity app. For browsers this is generally some direct user action, like clicking a link or button. --&gt;</p>
+<h4><strong>Response</strong></h4>
+<p>An invocation of <code>Web5.connect()</code> produces the following items in response:</p>
+<ul>
+<li><strong><code>web5</code></strong> - <em><code>Web5 instance</code></em>: A class instance that enables access to a locally running DWeb Node, DID interaction methods, and other capabilities related to the connected DID.</li>
+<li><strong><code>did</code></strong> - <em><code>string</code></em>: The DID that was created or attained connection to.</li>
+</ul>
+<h3><strong><code>Record</code> instances from responses</strong></h3>
+<p>Every modifying method (<code>create</code>, <code>write</code>, etc.) and the <code>entries</code> from queries return an instance of a <code>Record</code> class, which is a representation of the Record(s) being referenced.</p>
+<p>Each <code>Record</code> instance has the following instance properties: <code>id</code>, <code>attestation</code>, <code>contextId</code>, <code>dataFormat</code>, <code>dateCreated</code>, <code>encryption</code>, <code>interface</code>, <code>method</code>, <code>parentId</code>, <code>protocol</code>, <code>protocolPath</code>, <code>recipient</code>, <code>schema</code>, <code>dataCid</code>, <code>dataSize</code>, <code>dateModified</code>, <code>datePublished</code>, and <code>published</code>.</p>
+<blockquote>
+<p><strong>Note</strong> The <strong><code>id</code></strong> property is a unique identifier based on the record entry's composition. All entries across all records are deterministically unique.</p>
+</blockquote>
+<p>Each <code>Record</code> instance has the following instance methods:</p>
+<ul>
+<li><strong><code>data</code></strong> - <em><code>object</code></em>: an object with the following convenience methods that read out the data of the record entry in the following formats:
+<ul>
+<li><strong><code>text</code></strong> - <em><code>function</code></em>: produces a textual representation of the data.</li>
+<li><strong><code>json</code></strong> - <em><code>function</code></em>: if the value is JSON data, this method will return a parsed JSON object.</li>
+<li><strong><code>stream</code></strong> - <em><code>function</code></em>: returns the raw stream of bytes for the data.</li>
+</ul>
+</li>
+<li><strong><code>send</code></strong> - <em><code>function</code></em>: sends the record the instance represents to the DWeb Node endpoints of a provided DID.</li>
+<li><strong><code>update</code></strong> - <em><code>function</code></em>: takes in a new request object matching the expected method signature of a <code>write</code> and overwrites the record. This is a convenience method that allows you to easily overwrite records with less verbosity.</li>
+<li><strong><code>delete</code></strong> - <em><code>function</code></em>: generates a <code>delete</code> entry tombstone for the record. This is a convenience method that allows you to easily delete records with less verbosity.</li>
+</ul>
+<h3><strong><code>web5.dwn.records.query(request)</code></strong></h3>
+<p>Method for querying either the locally connected DWeb Node or any remote DWeb Node specified in the <code>from</code> property.</p>
+<pre><code class="language-javascript">// This invocation will query the user's own DWeb Nodes
+const { records } = await web5.dwn.records.query({
+  message: {
+    filter: {
+      schema: &quot;https://schema.org/Playlist&quot;,
+      dataFormat: &quot;application/json&quot;,
+    },
+  },
+});
+
+console.log(records); // an array of record entries from Bob's DWeb Nodes
+
+// This invocation will query Bob's DWeb Nodes
+const { records } = await web5.dwn.records.query({
+  from: &quot;did:example:bob&quot;,
+  message: {
+    filter: {
+      protocol: &quot;https://music.org/protocol&quot;,
+      schema: &quot;https://schema.org/Playlist&quot;,
+      dataFormat: &quot;application/json&quot;,
+    },
+  },
+});
+
+console.log(records); // an array of record entries from Bob's DWeb Nodes
+</code></pre>
+<h4><strong>Request</strong></h4>
+<p>The query <code>request</code> contains the following properties:</p>
+<ul>
+<li><strong><code>from</code></strong> - <em><code>DID string</code></em> (<em>optional</em>): the decentralized identifier of the DWeb Node the query will fetch results from.</li>
+<li><strong><code>message</code></strong> - <em><code>object</code></em>: the properties of the DWeb Node Message Descriptor that will be used to construct a valid record query:
+<ul>
+<li><strong><code>filter</code></strong> - <em><code>object</code></em>: properties against which results of the query will be filtered:
+<ul>
+<li><strong><code>protocol</code></strong> - <em><code>URI string</code></em> (<em>optional</em>): the URI of the protocol bucket in which to query.</li>
+<li><strong><code>schema</code></strong> - <em><code>URI string</code></em> (<em>optional</em>): the URI of the schema bucket in which to query.</li>
+<li><strong><code>dataFormat</code></strong> - <em><code>Media Type string</code></em> (<em>optional</em>): the IANA string corresponding with the format of the data to filter for. See IANA's Media Type list here: https://www.iana.org/assignments/media-types/media-types.xhtml</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h3><strong><code>web5.dwn.records.create(request)</code></strong></h3>
+<p>Method for creating a new record and storing it in the user's local DWeb Node, remote DWeb Nodes, or another party's DWeb Nodes (if permitted).</p>
+<pre><code class="language-javascript">// this creates a record and stores it in the user's local DWeb Node
+const { record } = await web5.dwn.records.create({
+  data: &quot;Hello World!&quot;,
+  message: {
+    dataFormat: &quot;text/plain&quot;,
+  },
+});
+
+console.log(await record.data.text()); // logs &quot;Hello World!&quot;
+const { status } = await record.send(myDid); // send the record to the user's remote DWeb Nodes
+const { status } = await record.send(&quot;did:example:bob&quot;); // send the newly generated record to Bob's DWeb Nodes
+
+// this creates a record, but does not store it in the user's local DWeb Node
+const { record } = await web5.dwn.records.create({
+  store: false,
+  data: &quot;Hello again, World!&quot;,
+  message: {
+    dataFormat: &quot;text/plain&quot;,
+  },
+});
+
+const { status } = await record.send(&quot;did:example:bob&quot;); // send the newly generated record to Bob's DWeb Nodes
+</code></pre>
+<h4><strong>Request</strong></h4>
+<p>The <code>create</code> request object is composed as follows:</p>
+<ul>
+<li><strong><code>store</code></strong> - <em><code>boolean</code></em> (<em>optional</em>): tells the create function whether or not to store the record in the user's local DWeb Node. (you might pass <code>false</code> if you didn't want to retain a copy of the record for yourself)</li>
+<li><strong><code>data</code></strong> - <em><code>text|object|file|blob</code></em>: the data payload of the record.</li>
+<li><strong><code>message</code></strong> - <em><code>object</code></em>: The properties of the DWeb Node Message Descriptor that will be used to construct a valid record query:
+<ul>
+<li><strong><code>protocol</code></strong> - <em><code>URI string</code></em> (<em>optional</em>): the URI of the protocol under which the record will be bucketed.</li>
+<li><strong><code>schema</code></strong> - <em><code>URI string</code></em> (<em>optional</em>): the URI of the schema under which the record will be bucketed.</li>
+<li><strong><code>dataFormat</code></strong> - <em><code>Media Type string</code></em> (<em>optional</em>): the IANA string corresponding with the format of the data the record will be bucketed. See IANA's Media Type list here: https://www.iana.org/assignments/media-types/media-types.xhtml</li>
+</ul>
+</li>
+</ul>
+<h3><strong><code>web5.dwn.records.write(request)</code></strong></h3>
+<p>The <code>create()</code> method is an alias for <code>write()</code> and both can take the same request object properties.</p>
+<h3><strong><code>web5.dwn.records.read(request)</code></strong></h3>
+<p>Method for reading a record stored in the user's local DWeb Node, remote DWeb Nodes, or another party's DWeb Nodes (if permitted).</p>
+<pre><code class="language-javascript">// Reads the indicated record from the user's DWeb Nodes
+const { record } = await web5.dwn.records.read({
+  message: {
+    recordId: &quot;bfw35evr6e54c4cqa4c589h4cq3v7w4nc534c9w7h5&quot;,
+  },
+});
+
+console.log(await record.data.text()); // assuming the record is a text payload, logs the text
+
+// Reads the indicated record from Bob's DWeb Nodes
+const { record } = await web5.dwn.records.read({
+  from: &quot;did:example:bob&quot;,
+  message: {
+    recordId: &quot;bfw35evr6e54c4cqa4c589h4cq3v7w4nc534c9w7h5&quot;,
+  },
+});
+
+console.log(await record.data.text()); // assuming the record is a text payload, logs the text
+</code></pre>
+<h4><strong>Request</strong></h4>
+<p>The <code>read</code> request object is composed as follows:</p>
+<ul>
+<li><strong><code>from</code></strong> - <em><code>DID string</code></em> (<em>optional</em>): The DID of the DWeb Node the read request will fetch the indicated record from.</li>
+<li><strong><code>message</code></strong> - <em><code>object</code></em>: The properties of the DWeb Node Message Descriptor that will be used to construct a valid DWeb Node message.
+<ul>
+<li><strong><code>recordId</code></strong> - <em><code>string</code></em>: the required record ID string that identifies the record data you are fetching.</li>
+</ul>
+</li>
+</ul>
+<h3><strong><code>web5.dwn.records.delete(request)</code></strong></h3>
+<p>Method for deleting a record stored in the user's local DWeb Node, remote DWeb Nodes, or another party's DWeb Nodes (if permitted).</p>
+<pre><code class="language-javascript">// Deletes the indicated record from the user's DWeb Node
+const { record } = await web5.dwn.records.delete({
+  message: {
+    recordId: &quot;bfw35evr6e54c4cqa4c589h4cq3v7w4nc534c9w7h5&quot;,
+  },
+});
+
+// Deletes the indicated record from Bob's DWeb Node
+const { record } = await web5.dwn.records.delete({
+  from: &quot;did:example:bob&quot;,
+  message: {
+    recordId: &quot;bfw35evr6e54c4cqa4c589h4cq3v7w4nc534c9w7h5&quot;,
+  },
+});
+</code></pre>
+<h4><strong>Request</strong></h4>
+<p>The <code>delete</code> request object is composed as follows:</p>
+<ul>
+<li><strong><code>from</code></strong> - <em><code>DID string</code></em> (<em>optional</em>): The DID of the DWeb Node the delete tombstone will be sent to.</li>
+<li><strong><code>message</code></strong> - <em><code>object</code></em>: The properties of the DWeb Node Message Descriptor that will be used to construct a valid DWeb Node message.
+<ul>
+<li><strong><code>recordId</code></strong> - <em><code>string</code></em>: the required record ID string that identifies the record being deleted.</li>
+</ul>
+</li>
+</ul>
+<h3><strong><code>web5.dwn.protocols.configure(request)</code></strong></h3>
+<p>Method for configuring a protocol definition in the DWeb Node of the user's local DWeb Node, remote DWeb Nodes, or another party's DWeb Nodes (if permitted).</p>
+<pre><code class="language-javascript">const { protocol } = await web5.dwn.protocols.configure({
+  message: {
+    definition: {
+      protocol: &quot;https://photos.org/protocol&quot;,
+      types: {
+        album: {
+          schema: &quot;https://photos.org/protocol/album&quot;,
+          dataFormats: [&quot;application/json&quot;],
+        },
+        photo: {
+          schema: &quot;https://photos.org/protocols/photo&quot;,
+          dataFormats: [&quot;application/json&quot;],
+        },
+        binaryImage: {
+          dataFormats: [&quot;image/png&quot;, &quot;jpeg&quot;, &quot;gif&quot;],
+        },
+      },
+      structure: {
+        album: {
+          $actions: [
+            {
+              who: &quot;recipient&quot;,
+              can: &quot;read&quot;,
+            },
+          ],
+        },
+        photo: {
+          $actions: [
+            {
+              who: &quot;recipient&quot;,
+              can: &quot;read&quot;,
+            },
+          ],
+          binaryImage: {
+            $actions: [
+              {
+                who: &quot;author&quot;,
+                of: &quot;photo&quot;,
+                can: &quot;write&quot;,
+              },
+            ],
+          },
+        },
+      },
+    },
+  },
+});
+
+protocol.send(myDid); // sends the protocol configuration to the user's other DWeb Nodes.
+</code></pre>
+<h4><strong>Request</strong></h4>
+<p>The <code>configure</code> request object is composed as follows:</p>
+<ul>
+<li><strong><code>message</code></strong> - <em><code>object</code></em>: The properties of the DWeb Node Message Descriptor that will be used to construct a valid DWeb Node message.
+<ul>
+<li><strong><code>definition</code></strong> - <em><code>object</code></em>: an object that defines the enforced composition of the protocol.
+<ul>
+<li><strong><code>protocol</code></strong> - <em><code>URI string</code></em>: a URI that represents the protocol being configured.</li>
+<li><strong><code>types</code></strong> - <em><code>object</code></em>: an object that defines the records that can be used in the <code>structure</code> graph of the <code>definition</code> object. The following properties are optional constraints you can set for the type being defined:
+<ul>
+<li><strong><code>schema</code></strong> - <em><code>URI string</code></em> (<em>optional</em>): the URI of the schema under which the record will be bucketed.</li>
+<li><strong><code>dataFormats</code></strong> - <em><code>Media Type string[]</code></em> (<em>optional</em>): Array of the IANA strings corresponding with the formats of the data the record will be bucketed. See IANA's Media Type list here: https://www.iana.org/assignments/media-types/media-types.xhtml</li>
+</ul>
+</li>
+<li><strong><code>structure</code></strong> - <em><code>object</code></em>: an object that defines the structure of a protocol, including data relationships and constraints on which entities can perform various activities. Fields under the <code>structure</code> object of the Protocol definition are expected to be either type references matching those defined in the <code>types</code> object. The type structures are recursive, so types form a graph and each type can have within it further attached types or the following rule statements that are all denoted with the prefix <code>$</code>:
+<ul>
+<li><strong><code>$actions</code></strong> - <em><code>array</code></em>: one or more rule objects that expose various allowed actions to actors (<code>author</code>, <code>recipient</code>), composed as follows:
+<ul>
+<li><strong><code>who</code></strong> - <em><code>string</code></em>: the actor (<code>author</code>, <code>recipient</code>) that is being permitted to invoke a given action.</li>
+<li><strong><code>of</code></strong> - <em><code>string</code></em>: the protocol path that refers to the record subject. Using the above example protocol, the protocol path to <code>binaryImage</code> would be <code>photo/binaryImage</code>.</li>
+<li><strong><code>can</code></strong> - <em><code>string</code></em>: the action being permitted by the rule.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h3><strong><code>web5.dwn.protocols.query(request)</code></strong></h3>
+<p>Method for querying a DID's DWeb Nodes for the presence of a protocol. This method is useful in detecting what protocols a given DID has installed to enable interaction over the protocol.</p>
+<pre><code class="language-javascript">const { protocols } = await web5.dwn.protocols.query({
+  message: {
+    filter: {
+      protocol: &quot;https://music.org/protocol&quot;,
+    },
+  },
+});
+
+console.log(protocols); // logs an array of protocol configurations installed on the user's own DWeb Node
+
+const { protocols } = await web5.dwn.protocols.query({
+  from: &quot;did:example:bob&quot;,
+  message: {
+    filter: {
+      protocol: &quot;https://music.org/protocol&quot;,
+    },
+  },
+});
+
+console.log(protocols); // logs an array of protocol configurations installed on Bob's DWeb Node
+</code></pre>
+<h4><strong>Request</strong></h4>
+<p>The query <code>request</code> must contain the following:</p>
+<ul>
+<li><strong><code>from</code></strong> - <em><code>DID string</code></em> (<em>optional</em>): the decentralized identifier of the DWeb Node the query will fetch results from.</li>
+<li><strong><code>message</code></strong> - <em><code>object</code></em>: The properties of the DWeb Node Message Descriptor that will be used to construct a valid record query:
+<ul>
+<li><strong><code>filter</code></strong> - <em><code>object</code></em> (<em>optional</em>): properties against which results of the query will be filtered:
+<ul>
+<li><strong><code>protocol</code></strong> - <em><code>URI string</code></em> (<em>optional</em>): the URI of the protocol bucket in which to query.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h3><strong><code>web5.did.create(method, options)</code></strong></h3>
+<p>The <code>create</code> method under the <code>did</code> object enables generation of DIDs for a supported set of DID Methods ('ion'|'key'). The output is method-specific, and handles things like key generation and assembly of DID Documents that can be published to DID networks.</p>
+<blockquote>
+<p>NOTE: You do not usually need to manually invoke this, as the <code>Web5.connect()</code> method already acquires a DID for the user (either by direct creation or connection to an identity agent app).</p>
+</blockquote>
+<pre><code class="language-javascript">const myDid = await Web5.did.create(&quot;ion&quot;);
+</code></pre>
+<h2>Project Resources</h2>
+<table>
+<thead>
+<tr>
+<th>Resource</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="https://github.com/TBD54566975/web5-js/blob/main/CODEOWNERS">CODEOWNERS</a></td>
+<td>Outlines the project lead(s)</td>
+</tr>
+<tr>
+<td><a href="https://github.com/TBD54566975/web5-js/blob/main/CODE_OF_CONDUCT.md">CODE_OF_CONDUCT.md</a></td>
+<td>Expected behavior for project contributors, promoting a welcoming environment</td>
+</tr>
+<tr>
+<td><a href="https://github.com/TBD54566975/web5-js/blob/main/CONTRIBUTING.md">CONTRIBUTING.md</a></td>
+<td>Developer guide to build, test, run, access CI, chat, discuss, file issues</td>
+</tr>
+<tr>
+<td><a href="https://github.com/TBD54566975/web5-js/blob/main/GOVERNANCE.md">GOVERNANCE.md</a></td>
+<td>Project governance</td>
+</tr>
+<tr>
+<td><a href="./LICENSE">LICENSE</a></td>
+<td>Apache License, Version 2.0</td>
+</tr>
+</tbody>
+</table>

@@ -1,0 +1,84 @@
+
+/*
+  This file is used for all of your global styles and CSS variables.
+  Check here https://developer.mozilla.org/en-US/docs/Web/CSS/Using_CSS_custom_properties for more info on using CSS variables.
+*/
+:root {
+  --font-family: "IBM Plex Mono", sans-serif;
+  --header-bk: rgb(255, 236, 25);
+  --header-text: #000;
+  --body-bk: #181818;
+  --header-bar: #2c2e31;
+  --content-max-width: 700px;
+}
+
+html, body {
+  font-family: var(--font-family);
+  padding: 0;
+  margin: 0;
+  height: 100%;
+  background-color: var(--body-bk) !important;
+}
+
+.sl-toast-stack {
+  right: 0;
+  bottom: 0;
+  top: auto;
+}
+
+@media (prefers-color-scheme: dark) {
+
+  html,
+  body {
+    background-color: var(--body-bk);
+    color: white;
+  }
+}
+
+@media (prefers-color-scheme: light) {
+
+  html,
+  body {
+    background-color: white;
+    color: black;
+  }
+}
+
+
+/* For Webkit-based browsers (Chrome, Safari) */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgb(40, 40, 40);
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.25);
+  border-radius: 6px;
+  border: 2px solid rgb(40, 40, 40);
+  background-clip: content-box;
+}
+
+/* For Firefox (version 64 and later) */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.25) rgb(40, 40, 40);
+}
+
+/* For Edge */
+::-ms-scrollbar {
+  width: 10px;
+}
+
+::-ms-scrollbar-track {
+  background: rgb(40, 40, 40);
+}
+
+::-ms-scrollbar-thumb {
+  border-radius: 6px;
+  border: 2px solid rgb(40, 40, 40);
+  background-color: rgba(255, 255, 255, 0.25);
+  background-clip: content-box;
+}
