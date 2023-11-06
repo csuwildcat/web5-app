@@ -1,6 +1,5 @@
 import { defineConfig } from 'vite';
 import nodePolyfills from 'vite-plugin-node-stdlib-browser';
-import CommonJs from 'vite-plugin-commonjs';
 import { VitePWA } from 'vite-plugin-pwa';
 
 // https://vitejs.dev/config/
@@ -33,7 +32,6 @@ export default defineConfig({
     }
   },
   plugins: [
-    CommonJs(),
     nodePolyfills(),
     VitePWA({
       strategies: "injectManifest",

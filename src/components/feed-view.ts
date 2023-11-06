@@ -97,7 +97,6 @@ export class FeedView extends LitElement {
 
       .markdown-body {
         max-width: 600px;
-        font-family: unset;
       }
 
     `

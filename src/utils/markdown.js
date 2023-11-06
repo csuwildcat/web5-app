@@ -19,7 +19,12 @@ export const styles = css`${unsafeCSS([
   BaseStyles,
   MathStyles,
   HighlightStyles,
-  GithubStyles
+  GithubStyles,
+  `
+    .markdown-body {
+      font-family: unset;
+    }
+  `
 ].join(''))}`
 
 export const plugins = [

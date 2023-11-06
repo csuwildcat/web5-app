@@ -22,10 +22,10 @@ export class PageFeed extends LitElement {
 
   constructor() {
     super();
-    this.posts = new Set();
     window.addEventListener('post-published', e => {
       this.feedView.processPost(e.detail.record);
     })
+    this.initialize();
   }
 
   async initialize(){
