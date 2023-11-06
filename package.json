@@ -26,10 +26,10 @@
     "@lit-labs/router": "0.1.1",
     "@shoelace-style/shoelace": "2.3.0",
     "@tailwindcss/typography": "^0.5.9",
-    "@web5/api": "0.8.2-alpha-20231105-26daadb",
     "@vaadin/app-layout": "24.0.4",
     "@vaadin/select": "24.0.4",
     "@vaadin/tabs": "^24.0.4",
+    "@web5/api": "0.8.2-alpha-20231105-26daadb",
     "buffer": "^6.0.3",
     "bytemd": "^1.21.0",
     "github-markdown-css": "^5.3.0",
@@ -37,11 +37,12 @@
     "katex": "^0.16.9",
     "lit": "3.0.1",
     "rollup-plugin-polyfill-node": "^0.12.0",
+    "sodium-javascript": "^0.8.0",
+    "vite-plugin-commonjs": "0.10.0",
+    "vite-plugin-node-stdlib-browser": "0.2.1",
     "workbox-build": "^6.5.2",
     "workbox-core": "^6.5.2",
-    "workbox-precaching": "^6.5.2",
-    "vite-plugin-node-stdlib-browser": "0.2.1",
-    "vite-plugin-commonjs": "0.10.0"
+    "workbox-precaching": "^6.5.2"
   },
   "devDependencies": {
     "typescript": "^4.6.3",

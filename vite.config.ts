@@ -1,6 +1,4 @@
 import { defineConfig } from 'vite';
-import { NodeGlobalsPolyfillPlugin } from '@esbuild-plugins/node-globals-polyfill';
-import { NodeModulesPolyfillPlugin } from '@esbuild-plugins/node-modules-polyfill';
 import nodePolyfills from 'vite-plugin-node-stdlib-browser';
 import CommonJs from 'vite-plugin-commonjs';
 import { VitePWA } from 'vite-plugin-pwa';
@@ -20,7 +18,7 @@ export default defineConfig({
   resolve: {
     alias: {
       // by node-globals-polyfill
-      events: 'rollup-plugin-node-polyfills/polyfills/events',
+      'sodium-native': 'sodium-javascript'
     }
   },
   define: {
@@ -37,8 +35,6 @@ export default defineConfig({
   plugins: [
     CommonJs(),
     nodePolyfills(),
-    NodeGlobalsPolyfillPlugin({ buffer: true, process: true }),
-    NodeModulesPolyfillPlugin(),
     VitePWA({
       strategies: "injectManifest",
       injectManifest: {
