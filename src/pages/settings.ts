@@ -1,50 +1,78 @@
-import { LitElement, html, css } from 'lit';
+import { LitElement, html, css, unsafeCSS } from 'lit';
 import { customElement } from 'lit/decorators.js';
 
+import PageStyles from  '../styles/page.css';
 @customElement('page-settings')
 export class PageSettings extends LitElement {
   static styles = [
+    unsafeCSS(PageStyles),
     css`
 
-      :host > * {
-        max-width: var(--content-max-width);
+      form {
+        max-width: 600px;
       }
 
-      :host > section {
-        opacity: 0;
-        transition: opacity 0.3s ease;
+      sl-input, sl-textarea {
+        margin: 0 0 1em;
       }
 
-      :host([state="active"]) {
-        z-index: 1;
+      .label-on-left {
+        --label-width: 7rem;
+        --gap-width: 1rem;
       }
 
-      :host([state="active"]) > section {
-        opacity: 1;
+      .label-on-left + .label-on-left {
+        margin-top: var(--sl-spacing-medium);
+      }
+
+      .label-on-left::part(form-control) {
+        display: grid;
+        grid: auto / var(--label-width) 1fr;
+        gap: var(--sl-spacing-3x-small) var(--gap-width);
+        align-items: center;
+      }
+
+      .label-on-left::part(form-control-label) {
+        text-align: right;
+      }
+
+      .label-on-left::part(form-control-help-text) {
+        grid-column-start: 2;
       }
     `
   ]
 
   constructor() {
     super();
+    this.initialize();
   }
 
-  async firstUpdated() {
-    console.log('This is your settings page');
+  async initialize(){
+    this.socialRecord = await datastore.getSocial() || await datastore.createSocial();
+    console.log(this.socialRecord);
+    this.socialData = await this.socialRecord?.data?.json?.() || {};
   }
 
-  async onPageEnter(){
-    console.log('Settings page is showing');
-  }
+  saveSocialInfo(){
 
-  async onPageLeave(){
-    console.log('Settings page is hiding');
   }
 
   render() {
     return html`
-      <section style="height: 1900px">
-        If you need a settings page, put it here.
+      <section>
+
+        <form id="profile_form">
+
+          <h2>Profile Info</h2>
+          <sl-input label="Display Name" help-text="A public name visible to everyone"></sl-input>
+          <sl-textarea label="Bio" help-text="Tell people a little about yourself" maxlength="280" rows="4" resize="none"></sl-textarea>
+
+          <h3>Social Accounts</h3>
+          <sl-input label="X (Twitter)" class="label-on-left"></sl-input>
+          <sl-input label="Instagram" class="label-on-left"></sl-input>
+          <sl-input label="Facebook" class="label-on-left"></sl-input>
+        </form>
+
       </section>
     `;
   }

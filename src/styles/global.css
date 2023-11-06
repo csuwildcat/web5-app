@@ -4,8 +4,9 @@
   Check here https://developer.mozilla.org/en-US/docs/Web/CSS/Using_CSS_custom_properties for more info on using CSS variables.
 */
 :root {
-  --font-family: "IBM Plex Mono", sans-serif;
-  --header-bk: rgb(255, 236, 25);
+  --font-family: 'Roboto Slab', serif;
+  --header-bk: rgb(25 127 89);
+  --link-color: rgb(82, 206, 160) !important;
   --header-text: #000;
   --body-bk: #181818;
   --header-bar: #2c2e31;

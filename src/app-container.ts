@@ -1,22 +1,24 @@
 
 import { LitElement, css, html } from 'lit';
-import { customElement } from 'lit/decorators.js';
+import { customElement, query } from 'lit/decorators.js';
 import { AppRouter } from './components/router';
 
 import './styles/global.css';
 import './components/global.js';
 import './styles/theme.js';
-import './utils/dom';
+import './utils/helpers';
 
 import '@vaadin/app-layout/theme/lumo/vaadin-app-layout.js';
 import '@vaadin/app-layout/theme/lumo/vaadin-drawer-toggle.js';
 import '@vaadin/tabs/theme/lumo/vaadin-tabs.js';
 
 import './pages/home';
-import './pages/docs';
+import './pages/feed';
+import './pages/drafts';
+import './pages/follows';
 import './pages/settings';
 
-import { Web5 } from '@tbd54566975/web5';
+import { Web5 } from '@web5/api';
 const { web5, did: userDID } = await Web5.connect();
 console.log(userDID);
 globalThis.userDID = userDID
@@ -50,26 +52,41 @@ export class AppContainer extends LitElement {
       }
 
       vaadin-app-layout::part(navbar) {
-        background: rgba(50 50 55 / 100%);
+        background: var(--header-bk);
         box-shadow: 0 0 2px 2px rgba(0 0 0 / 25%);
-        z-index: 2;
+        z-index: 1;
+      }
+
+      vaadin-app-layout #logo {
+        font-size: 1.2em;
+      }
+
+      vaadin-app-layout #slogan {
+        color: rgba(255,255,255,0.5);
+        margin: 0.2em 0 0;
+        font-size: 0.8em;
       }
 
       vaadin-app-layout h1 {
-        margin: 0;
+        margin: 0 0.6em 0 0.4em;
         font-size: 1.2em;
-
+        text-shadow: 0 1px 1px rgba(0,0,0,0.5);
       }
 
       vaadin-app-layout::part(drawer) {
-        width: 14em;
+        width: 10em;
         padding-top: 0.5em;
         background: rgba(44 44 49 / 100%);
         border-inline-end: 1px solid rgb(255 255 255 / 2%);
       }
 
       vaadin-app-layout vaadin-tab {
+        font-family: var(--font-family);
         padding: 0.75rem 1.2rem;
+      }
+
+      vaadin-app-layout vaadin-tab[selected] {
+        color: var(--link-color);
       }
 
       vaadin-app-layout vaadin-tab a :first-child {
@@ -107,6 +124,23 @@ export class AppContainer extends LitElement {
       h1 img {
         height: 2em;
         margin-right: 0.5em;
+      }
+
+      #editor {
+        position: fixed;
+        z-index: 2;
+      }
+
+      @media(max-width: 500px) {
+        #editor {
+          --modal-height: 100%;
+          --modal-width: 100%;
+          --modal-border-radius: 0rem;
+        }
+
+        main > * {
+          padding: 1.75em;
+        }
       }
 
       /* main > *[state="active"] {
@@ -170,8 +204,16 @@ export class AppContainer extends LitElement {
           component: '#home'
         },
         {
-          path: '/docs',
-          component: '#docs'
+          path: '/feed',
+          component: '#feed'
+        },
+        {
+          path: '/drafts',
+          component: '#drafts'
+        },
+        {
+          path: '/follows',
+          component: '#follows'
         },
         {
           path: '/settings',
@@ -180,26 +222,19 @@ export class AppContainer extends LitElement {
       ]
     });
 
-    this.addEventListener('app-notify', e => this.notify(e.detail.message, e.detail))
-
+    this.addEventListener('open-editor', e => this.openEditor(e.detail.record))
   }
+
+  @query('#editor')
+  editor;
 
   firstUpdated() {
     this.nav = this.renderRoot.querySelector('#global_nav');
     DOM.skipFrame(() => this.router.goto(location.pathname));
   }
 
-  notify(message, options = {}) {
-    const alert = Object.assign(document.createElement('sl-alert'), {
-      variant: 'primary',
-      duration: 3000,
-      closable: true,
-      innerHTML: `
-        <sl-icon name="${options.icon || 'info-circle'}" slot="icon"></sl-icon>
-        ${document.createTextNode(message).textContent}
-      `
-    }, options);
-    return document.body.appendChild(alert).toast();
+  openEditor(record){
+    this.editor.open(record);
   }
 
   render() {
@@ -211,7 +246,9 @@ export class AppContainer extends LitElement {
           <sl-icon name="list"></sl-icon>
         </vaadin-drawer-toggle>
 
-        <h1 slot="navbar">DWA Starter</h1>
+        <sl-icon id="logo" name="newspaper" slot="navbar"></sl-icon>
+        <h1 slot="navbar">Dai<span>1</span>y</h1>
+        <small id="slogan" slot="navbar">Make it count</small>
 
         <vaadin-tabs id="global_nav" slot="drawer" orientation="vertical">
           <vaadin-tab>
@@ -221,9 +258,21 @@ export class AppContainer extends LitElement {
             </a>
           </vaadin-tab>
           <vaadin-tab>
-            <a tabindex="-1" href="/docs">
-              <sl-icon name="file-earmark-text"></sl-icon>
-              <span>Docs</span>
+            <a tabindex="-1" href="/feed">
+              <sl-icon name="file-earmark-richtext"></sl-icon>
+              <span>My Feed</span>
+            </a>
+          </vaadin-tab>
+          <vaadin-tab>
+            <a tabindex="-1" href="/drafts">
+              <sl-icon name="pencil"></sl-icon>
+              <span>Drafts</span>
+            </a>
+          </vaadin-tab>
+          <vaadin-tab>
+            <a tabindex="-1" href="/follows">
+              <sl-icon name="people"></sl-icon>
+              <span>Follows</span>
             </a>
           </vaadin-tab>
           <vaadin-tab>
@@ -236,12 +285,15 @@ export class AppContainer extends LitElement {
 
         <main id="pages">
           <page-home id="home" scroll></page-home>
-          <page-docs id="docs" scroll></page-docs>
+          <page-feed id="feed" scroll></page-feed>
+          <page-drafts id="drafts" scroll></page-drafts>
+          <page-follows id="follows" scroll></page-follows>
           <page-settings id="settings" scroll></page-settings>
         </main>
 
       </vaadin-app-layout>
 
+      <post-editor id="editor"></post-editor>
 
     `;
   }

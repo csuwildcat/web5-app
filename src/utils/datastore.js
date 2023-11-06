@@ -1,106 +1,135 @@
 
 import { toWebStream } from "./streams";
-
+import * as protocols from './protocols';
 class Datastore {
 
   constructor(options){
     this.did = options.did;
     this.dwn = options.web5.dwn;
-    this.ready = new Promise(resolve => {
-      this.getProtocol().then(async response => {
-        if (response.protocols.length) {
-          console.log('existing');
-          resolve();
-        }
-        else {
-          console.log('new');
-          this.setProtocol().then(z => resolve());
-        }
-      })
-    })
+    this.ready = this.installProtocols();
   }
 
-  protocolUri = 'urn:example';
-  postSchema = 'urn:example/post';
-
-  getProtocol(){
-    return this.dwn.protocols.query({
+  async installProtocols(){
+    const response = await this.dwn.protocols.query({
       message: {
         filter: {
-          protocol: this.protocolUri
+          protocol: protocols.dai1y.uri
         }
       }
     });
+    if (response.protocols.length) {
+      console.log('existing');
+      return true;
+    }
+    else {
+      console.log('installing');
+      try {
+        await Promise.all(
+          Object.values(protocols).map(protocol => {
+            console.log(protocol)
+            return this.dwn.protocols.configure({
+              message: {
+                definition: protocol.definition
+              }
+            })
+          })
+        )
+        console.log('installed');
+      }
+      catch (e) {
+        console.log(e);
+        return false;
+      }
+    }
   }
 
-  setProtocol(){
-    return this.dwn.protocols.configure({
-      message: {
-        definition: {
-          protocol: this.protocolUri,
-          types: {
-            post: {
-              schema: this.postSchema,
-              dataFormats: ['application/json']
-            },
-            image: {
-              dataFormats: ['image/gif', 'image/x-png', 'image/jpeg']
-            }
-          },
-          structure: {
-            post: {},
-            image: {}
-          }
-        }
-      }
-    });
-  }
-  async createPost(json, format){
+  async createSocial(json = {}){
+    await this.ready;
     const { record } = await this.dwn.records.create({
       data: json,
       message: {
-        protocol: this.protocolUri,
-        protocolPath: 'post',
-        schema: this.postSchema,
+        protocol: protocols.profile.uri,
+        protocolPath: 'social',
+        schema: protocols.profile.schemas.social,
         dataFormat: 'application/json'
       }
     });
-    record.json = await record.data.json();
+    console.log(record);
+    return record;
+  }
+
+  async getSocial(options = {}){
+    await this.ready;
+    const params = {
+      message: {
+        filter: {
+          protocol: protocols.profile.uri,
+          protocolPath: 'social',
+        },
+        dateSort: 'createdDescending'
+      }
+    }
+    if (options.from) params.from = options.from;
+    const { records } = await this.dwn.records.query(params);
+    return records[0];
+  }
+
+  async createPost(json = {}){
+    await this.ready;
+    const { record } = await this.dwn.records.create({
+      data: json,
+      message: {
+        protocol: protocols.dai1y.uri,
+        protocolPath: 'post',
+        schema: protocols.dai1y.schemas.post,
+        dataFormat: 'application/json'
+      }
+    });
+    console.log(json);
     return record;
   }
 
   async getPost(postId){
+    await this.ready;
     const { record, status } = await this.dwn.records.read({
       message: {
-        recordId: postId
-      }
-    });
-    if (status.code !== 200) return false;
-    record.postData = await record.data.json();
-    return record;
-  }
-
-  async getPosts(){
-    const { records } = await this.dwn.records.query({
-      message: {
         filter: {
-          protocol: this.protocolUri,
-          schema: this.postSchema
+          recordId: postId
         }
       }
     });
-    return Promise.all(records.map(async entry => {
-      const json = await entry.data.json()
-      entry.postData = json;
-      return entry;
-    }))
+    if (status.code !== 200) return false;
+    return record;
+  }
+
+  async getPosts(options = {}){
+    await this.ready;
+    const filter = {
+      protocol: protocols.dai1y.uri,
+      schema: protocols.dai1y.schemas.post
+    }
+    if (options.published !== undefined) filter.published = options.published
+
+    const params = {
+      message: {
+        filter: filter,
+        dateSort: options.sort || 'createdDescending'
+      },
+
+    }
+    if (options.from) params.from = options.from;
+
+    const { records } = await this.dwn.records.query(params);
+
+    return records
   }
 
   async createImage(file, format){
+    await this.ready;
     const { record } = await this.dwn.records.create({
       data: file,
       message: {
-        protocol: this.protocolUri,
+        protocol: protocols.dai1y.uri,
         protocolPath: 'image',
         dataFormat: format
       }
@@ -110,9 +139,12 @@ class Datastore {
   }
 
   async getImage(imageId){
+    await this.ready;
     const { record } = await this.dwn.records.read({
       message: {
-        recordId: imageId
+        filter: {
+          recordId: imageId
+        }
       }
     });
     if (!record) return;

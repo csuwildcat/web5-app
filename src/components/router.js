@@ -11,23 +11,25 @@ export class AppRouter extends Router {
       }
       enteringRoute.enter = async () => {
         await Promise.all(
-          routes.reduce((promises, leavingRoute) => {
-            const leavingComponent = leavingRoute.component();
-            const enteringComponent = enteringRoute.component();
-            leavingComponent?.removeAttribute('state');
-            enteringComponent?.setAttribute('state', 'active');
-            if (leavingComponent !== enteringComponent) {
+          routes.reduce((promises, route) => {
+            const leavingComponent = route.component();
+            if (route !== enteringRoute && leavingComponent?.getAttribute('state') === 'active') {
               promises.push(leavingComponent?.onPageLeave?.())
             }
+            leavingComponent?.removeAttribute('state');
             return promises;
-          }, [
-            props?.onRouteChange?.(enteringRoute),
+          }, [props?.onRouteChange?.(enteringRoute)]).concat([
             enteringRoute?.onEnter?.(),
             enteringRoute.component()?.onPageEnter?.()
           ])
-        );
+        )
+        enteringRoute.component().setAttribute('state', 'active');
       }
       return enteringRoute;
     }))
   }
+  navigateTo = (route, state = {}) => {
+    history.pushState(state, state.title || '', route)
+    this.goto(route);
+  };
 }
