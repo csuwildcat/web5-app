@@ -29,10 +29,6 @@ export class PageDrafts extends LitElement {
         z-index: 1;
       }
 
-      :host [placehold] {
-        margin: 1em;
-      }
-
       #posts {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
@@ -243,7 +239,7 @@ export class PageDrafts extends LitElement {
               </sl-card>
             `
         })}
-        <div placeholder="firstrun clickable" @click="${e => this.createPost(true)}">
+        <div default-content="firstrun clickable" @click="${e => this.createPost(true)}">
           <sl-icon name="file-earmark-plus"></sl-icon>
           Click here to create a draft
         </div>

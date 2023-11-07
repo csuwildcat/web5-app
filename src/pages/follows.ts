@@ -16,21 +16,9 @@ export class PageFollows extends LitElement {
     super();
   }
 
-  async firstUpdated() {
-    console.log('Follow page updated');
-  }
-
-  async onPageEnter(){
-    console.log('Follow page is showing');
-  }
-
-  async onPageLeave(){
-    console.log('Follow page is hiding');
-  }
-
   render() {
     return html`
-      <section style="height: 1900px">
+      <section>
         List of follows you are following.
       </section>
     `;

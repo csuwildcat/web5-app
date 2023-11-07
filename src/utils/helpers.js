@@ -1,4 +1,13 @@
 
+const natives = {
+  deepSet(obj, path, value) {
+    const keys = path.split('.');
+    const lastKey = keys.pop();
+    const lastObj = keys.reduce((o, key) => o[key] = o[key] || {}, obj);
+    lastObj[lastKey] = value;
+  }
+}
+
 var DOM = {
   ready: new Promise(resolve => {
     document.addEventListener('DOMContentLoaded', e => {
@@ -98,4 +107,4 @@ window.addEventListener('pointerup', e => {
 
 globalThis.DOM = DOM;
 
-export { DOM, notify };
+export { DOM, notify, natives };

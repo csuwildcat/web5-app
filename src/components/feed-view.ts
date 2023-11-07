@@ -277,7 +277,7 @@ export class FeedView extends LitElement {
             </div>
           `
       })}
-      <div placeholder="firstrun clickable" @click="${e => globalThis.router.navigateTo('/drafts')}">
+      <div default-content="firstrun clickable" @click="${e => globalThis.router.navigateTo('/drafts')}">
         <sl-icon name="file-earmark-plus"></sl-icon>
         You haven't published any posts. Click here to switch to the drafts area, where you can create or publish one.
       </div>
