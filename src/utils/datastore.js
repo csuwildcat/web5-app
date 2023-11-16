@@ -43,51 +43,76 @@ class Datastore {
     }
   }
 
-  async createSocial(json = {}){
-    await this.ready;
-    const { record } = await this.dwn.records.create({
-      data: json,
+  async getProtocol(protocolUri, options){
+    const params = {
+      from: options.from,
       message: {
-        protocol: protocols.profile.uri,
-        protocolPath: 'social',
-        schema: protocols.profile.schemas.social,
-        dataFormat: 'application/json'
+        filter: {
+          protocol: protocolUri,
+        }
       }
-    });
-    console.log(record);
-    return record;
+    }
+    const { protocols } = await this.dwn.protocols.query(params);
+    return protocols[0];
   }
 
-  async getSocial(options = {}){
+  async queryProtocolRecords(protocol, path, options = {}){
     await this.ready;
     const params = {
       message: {
         filter: {
-          protocol: protocols.profile.uri,
-          protocolPath: 'social',
-        },
-        dateSort: 'createdDescending'
+          protocol: protocols[protocol].uri,
+          protocolPath: path,
+        }
       }
     }
     if (options.from) params.from = options.from;
+    if (options.published !== undefined) {
+      params.message.filter.published = options.published
+    }
+    if (options.sort || options.latestRecord) {
+      params.message.dateSort = options.latestRecord ? 'createdDescending' : options.sort;
+    }
+
     const { records } = await this.dwn.records.query(params);
-    return records[0];
+    return options.latestRecord ? records[0] : records;
   }
 
-  async createPost(json = {}){
+  async createProtocolRecord(protocol, path, options = {}){
     await this.ready;
-    const { record } = await this.dwn.records.create({
-      data: json,
+    const params = {
       message: {
-        protocol: protocols.dai1y.uri,
-        protocolPath: 'post',
-        schema: protocols.dai1y.schemas.post,
-        dataFormat: 'application/json'
+        protocol: protocols[protocol].uri,
+        protocolPath: path
       }
+    }
+    const schema = protocols[protocol].schemas[path.split('/').pop()];
+    if (schema) params.message.schema = schema;
+    if (options.from) params.from = options.from;
+    if (options.data) params.data = options.data;
+    if (options.dataFormat) params.message.dataFormat = options.dataFormat;
+    const { record } = await this.dwn.records.create(params);
+    record.send(this.did).then(e => {
+      console.log(e)
+    }).catch(e => {
+      console.log(e)
     });
-    console.log(json);
     return record;
   }
+
+  getSocial = (options = {}) => this.queryProtocolRecords('profile', 'social', {
+    latestRecord: true
+  })
+
+  createSocial = (options = {}) => this.createProtocolRecord('profile', 'social', {
+    data: options.data,
+    dataFormat: 'application/json'
+  })
+
+  createPost = (options = {}) => this.createProtocolRecord('dai1y', 'post', {
+    data: options.data,
+    dataFormat: 'text/markdown'
+  })
 
   async getPost(postId){
     await this.ready;
@@ -102,54 +127,32 @@ class Datastore {
     return record;
   }
 
-  async getPosts(options = {}){
+  async readAvatar(id){
     await this.ready;
-    const filter = {
-      protocol: protocols.dai1y.uri,
-      schema: protocols.dai1y.schemas.post
-    }
-    if (options.published !== undefined) filter.published = options.published
-
-    const params = {
-      message: {
-        filter: filter,
-        dateSort: options.sort || 'createdDescending'
-      },
-
-    }
-    if (options.from) params.from = options.from;
-
-    const { records } = await this.dwn.records.query(params);
-
-    return records
-  }
-
-  async createImage(file, format){
-    await this.ready;
-    const { record } = await this.dwn.records.create({
-      data: file,
-      message: {
-        protocol: protocols.dai1y.uri,
-        protocolPath: 'image',
-        dataFormat: format
-      }
-    });
-    record.blobUrl = URL.createObjectURL(await record.data.blob());
-    return record;
-  }
-
-  async getImage(imageId){
-    await this.ready;
-    const { record } = await this.dwn.records.read({
+    const { record, status } = await this.dwn.records.read({
       message: {
         filter: {
-          recordId: imageId
+          recordId: id
         }
       }
     });
-    if (!record) return;
-    record.blobUrl = URL.createObjectURL(await record.data.blob());
+    if (status.code !== 200) return false;
     return record;
+  }
+
+  getPosts = (options = {}) => this.queryProtocolRecords('dai1y', 'post', options)
+
+  getAvatar = (options = {}) => this.queryProtocolRecords('profile', 'avatar', Object.assign({
+    latestRecord: true
+  }, options))
+
+  createAvatar = (options = {}) => {
+    if (options.data && options.data instanceof File) {
+      const type = options.data.type;
+      options.data = new Blob([options.data], { type });
+      options.dataFormat = type;
+    }
+    return this.createProtocolRecord('profile', 'avatar', options)
   }
 
 }

@@ -18,7 +18,7 @@ export const dai1y = {
     types: {
       post: {
         schema: dai1ySchemas.post,
-        dataFormats: ['application/json']
+        dataFormats: ['text/markdown']
       },
       image: {
         dataFormats: ['image/gif', 'image/x-png', 'image/jpeg']

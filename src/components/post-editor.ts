@@ -7,8 +7,6 @@ import * as markdown from  '../utils/markdown.js';
 import ScrollStyles from '../styles/scroll.js'
 import examples from '../utils/example-markdown.js'
 import { DOM, notify } from '../utils/helpers.js';
-
-import { DOM } from '../utils/helpers.js';
 import './global.js'
 
 export interface PostEditor {

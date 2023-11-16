@@ -54,7 +54,6 @@ export class AppContainer extends LitElement {
       vaadin-app-layout::part(navbar) {
         background: var(--header-bk);
         box-shadow: 0 0 2px 2px rgba(0 0 0 / 25%);
-        z-index: 1;
       }
 
       vaadin-app-layout #logo {
@@ -103,16 +102,17 @@ export class AppContainer extends LitElement {
         box-sizing: border-box;
         height: 100%;
         width: 100%;
-        padding: 2.5em;
         opacity: 0;
+        background-color: var(--body-bk) !important;
         visibility: hidden;
         transition: visibility 0.3s, opacity 0.3s ease;
         overflow-y: scroll;
+        z-index: -1;
       }
 
       main > [state="active"] {
         opacity: 1;
-        z-index: 1;
+        z-index: 0;
         visibility: visible;
       }
 
@@ -136,10 +136,6 @@ export class AppContainer extends LitElement {
           --modal-height: 100%;
           --modal-width: 100%;
           --modal-border-radius: 0rem;
-        }
-
-        main > * {
-          padding: 1.75em;
         }
       }
 

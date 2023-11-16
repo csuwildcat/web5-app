@@ -19,23 +19,12 @@ export class PageDrafts extends LitElement {
         padding: 0 0 2em !important;
       }
 
-      #view_header {
-        position: sticky;
-        top: 0;
-        max-width: none;
-        padding: 1.1em 1.2em 1em;
-        background: rgba(44 44 49 / 90%);
-        border-bottom: 1px solid rgba(0 0 0 / 50%);
-        z-index: 1;
-      }
-
       #posts {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
         gap: 2em;
         max-width: 1000px;
         margin: 0 auto 2em;
-        padding: 2em;
       }
 
       #posts > sl-card {
@@ -127,12 +116,14 @@ export class PageDrafts extends LitElement {
   async createPost(openEditor){
     try {
       const record = await datastore.createPost({
-        markdown: `# New Post
+        data: {
+          markdown: `# New Post
 
 1. Make
 2. it
 3. count
 `
+        }
       });
       this.processPost(record);
       this.requestUpdate();

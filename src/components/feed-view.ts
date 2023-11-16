@@ -50,7 +50,7 @@ export class FeedView extends LitElement {
       }
 
       .post {
-        display: flex;
+        max-width: 600px;
       }
 
       .date {
@@ -93,10 +93,6 @@ export class FeedView extends LitElement {
       .post .markdown-body {
         flex: 1;
         background: none;
-      }
-
-      .markdown-body {
-        max-width: 600px;
       }
 
     `

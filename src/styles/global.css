@@ -18,7 +18,7 @@ html, body {
   padding: 0;
   margin: 0;
   height: 100%;
-  background-color: var(--body-bk) !important;
+  background: none !important;
 }
 
 .sl-toast-stack {
@@ -31,7 +31,6 @@ html, body {
 
   html,
   body {
-    background-color: var(--body-bk);
     color: white;
   }
 }
