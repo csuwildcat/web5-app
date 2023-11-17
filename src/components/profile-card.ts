@@ -21,7 +21,7 @@ export class ProfileCard extends LitElement {
   static properties = {
     did: {
       type: String,
-      relfect: true
+      reflect: true
     }
   };
 
@@ -30,14 +30,20 @@ export class ProfileCard extends LitElement {
     super();
   }
 
-  set did(uri){
-    console.log(uri);
-    datastore.getAvatar({ from: uri }).then(({ record }) => {
-      console.log()
-      if (this.did === uri) {
-        this.avatarRecord = record;
-
-      }
+  set did(did){
+    console.log(this.did);
+    Promise.all([
+      datastore.getAvatar({ from: did }).then(async ({ record }) => {
+        const blob = record.data.blob();
+        this.avatarDataUri = blob ? URL.createObjectURL(blob) : undefined;
+        console.log(this.avatarDataUri);
+      }),
+      datastore.getSocial({ from: did }).then(async ({ record }) => {
+        this.socialData = record.data.json() || {};
+        console.log(this.socialData);
+      })
+    ]).then(() => {
+      if (this.did === did) this.requestUpdate()
     })
   }
 
@@ -51,7 +57,7 @@ export class ProfileCard extends LitElement {
 
   render() {
     return html`
-      <w5-img id="profile_image" src="${ this.did }" fallback="person"></w5-img>
+      <w5-img id="profile_image" src="${ ifDefined(this.avatarDataUri) }" fallback="person"></w5-img>
     `;
   }
 }

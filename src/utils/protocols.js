@@ -3,7 +3,8 @@ const dai1yProtocolUri = 'https://dai1y.app';
 const dai1ySchemas = [
         'post',
         'follow',
-        'bookmark'
+        'bookmark',
+        'image',
       ].reduce((obj, label) => {
         obj[label] = dai1yProtocolUri + '/schemas/' + label;
         return obj;
@@ -21,6 +22,7 @@ export const dai1y = {
         dataFormats: ['text/markdown']
       },
       image: {
+        schema: dai1ySchemas.image,
         dataFormats: ['image/gif', 'image/x-png', 'image/jpeg']
       },
       follow: {
@@ -84,37 +86,18 @@ export const profile = {
         dataFormats: ['application/json']
       },
       avatar: {
+        schema: profileSchemas.avatar,
         dataFormats: ['image/gif', 'image/png', 'image/jpeg']
       },
       hero: {
+        schema: profileSchemas.hero,
         dataFormats: ['image/gif', 'image/png', 'image/jpeg']
       }
     },
     structure: {
-      social: {
-        $actions: [
-          {
-            who: "anyone",
-            can: "read"
-          }
-        ]
-      },
-      avatar: {
-        $actions: [
-          {
-            who: "anyone",
-            can: "read"
-          }
-        ]
-      },
-      hero: {
-        $actions: [
-          {
-            who: "anyone",
-            can: "read"
-          }
-        ]
-      },
+      social: {},
+      avatar: {},
+      hero: {},
       name: {},
       messaging: {},
       address: {},

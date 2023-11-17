@@ -37,6 +37,10 @@ export class PageSettings extends LitElement {
         border-style: solid;
       }
 
+      #profile_image::part(fallback) {
+        font-size: 3em;
+      }
+
       #profile_image_container small {
         display: block;
         margin: 0.7em 0 0;
@@ -98,10 +102,9 @@ export class PageSettings extends LitElement {
   async initialize(){
     this.socialRecord = await datastore.getSocial() || await datastore.createSocial({ data: this.socialData });
     this.socialData = await this.socialRecord?.data?.json?.() || this.socialData;
+    console.log(this.socialRecord);
 
-    this.avatarRecord = await datastore.getAvatar();
-    await this.setAvatar(this.avatarRecord, false);
-
+    await this.setAvatar(null, false);
     this.requestUpdate();
     DOM.skipFrame(() => {
       this.profileForm.toggleAttribute('loading');
@@ -110,15 +113,26 @@ export class PageSettings extends LitElement {
   }
 
   async setAvatar(file, update){
-    if (file) {
-      if (file !== this.avatarRecord) {
-        this.avatarRecord = await datastore.createAvatar({ data: file });
+    let blob = file ? new Blob([file], { type: file.type }) : undefined;
+    try {
+      this.avatarRecord = this.avatarRecord || await datastore.getAvatar();
+      if (blob) {
+        if (this.avatarRecord) await this.avatarRecord.delete();
+        this.avatarRecord = await datastore.createAvatar({ data: blob });
+        await this.avatarRecord.send(userDID);
       }
-      const blob = await (await datastore.readAvatar(this.avatarRecord.id)).data.blob();
-      this.avatarDataUri = blob ? URL.createObjectURL(blob) : undefined;
-      console.log(this.avatarDataUri);
-      if (update !== false) this.requestUpdate();
+      else if (this.avatarRecord) {
+        console.log(this.avatarRecord.read);
+        // blob = await this.avatarRecord.data.blob(); // BUG due to 'protocol property undefined' error
+        blob = await (await datastore.readAvatar(this.avatarRecord.id))?.data?.blob(); // WORKAROUND with a forced read
+      }
     }
+    catch(e) {
+      console.log(e);
+    }
+    this.avatarDataUri = blob ? URL.createObjectURL(blob) : undefined;
+    console.log(this.avatarDataUri);
+    if (update !== false) this.requestUpdate();
   }
 
   handleFileChange(e){
@@ -131,7 +145,9 @@ export class PageSettings extends LitElement {
       natives.deepSet(this.socialData, entry[0], entry[1] || undefined);
     }
     try {
-      await this.socialRecord.update({ data: this.socialData })
+      await this.socialRecord.update({ data: this.socialData });
+      const { status } = await this.socialRecord.send(userDID)
+      console.log(status);
       notify.success('Your profile info was saved')
     }
     catch(e) {
@@ -144,7 +160,7 @@ export class PageSettings extends LitElement {
     return html`
       <section>
 
-        <form id="profile_form" loading @sl-change="${e => this.saveSocialInfo(e)}">
+        <form id="profile_form" loading @sl-change="${e => this.saveSocialInfo(e)}" @submit="${e => e.preventDefault()}">
 
           <h2>Profile Info</h2>
 

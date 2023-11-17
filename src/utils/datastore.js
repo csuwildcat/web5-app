@@ -25,13 +25,13 @@ class Datastore {
       console.log('installing');
       try {
         await Promise.all(
-          Object.values(protocols).map(protocol => {
-            console.log(protocol)
-            return this.dwn.protocols.configure({
+          Object.values(protocols).map(async _protocol => {
+            const { protocol } = await this.dwn.protocols.configure({
               message: {
-                definition: protocol.definition
+                definition: _protocol.definition
               }
             })
+            await protocol.send(this.did);
           })
         )
         console.log('installed');
@@ -43,7 +43,7 @@ class Datastore {
     }
   }
 
-  async getProtocol(protocolUri, options){
+  async getProtocol(protocolUri, options = {}){
     const params = {
       from: options.from,
       message: {
@@ -52,8 +52,8 @@ class Datastore {
         }
       }
     }
-    const { protocols } = await this.dwn.protocols.query(params);
-    return protocols[0];
+    const { protocols, status } = await this.dwn.protocols.query(params);
+    return { protocol: protocols[0], status };
   }
 
   async queryProtocolRecords(protocol, path, options = {}){
@@ -83,7 +83,8 @@ class Datastore {
     const params = {
       message: {
         protocol: protocols[protocol].uri,
-        protocolPath: path
+        protocolPath: path,
+        schema: protocols[protocol][path.split('/').pop()]
       }
     }
     const schema = protocols[protocol].schemas[path.split('/').pop()];
@@ -91,20 +92,23 @@ class Datastore {
     if (options.from) params.from = options.from;
     if (options.data) params.data = options.data;
     if (options.dataFormat) params.message.dataFormat = options.dataFormat;
+    if (options.published) params.message.published = true;
     const { record } = await this.dwn.records.create(params);
     record.send(this.did).then(e => {
       console.log(e)
     }).catch(e => {
       console.log(e)
     });
+    console.log(record);
     return record;
   }
 
-  getSocial = (options = {}) => this.queryProtocolRecords('profile', 'social', {
+  getSocial = (options = {}) => this.queryProtocolRecords('profile', 'social', Object.assign({
     latestRecord: true
-  })
+  }, options))
 
   createSocial = (options = {}) => this.createProtocolRecord('profile', 'social', {
+    published: true,
     data: options.data,
     dataFormat: 'application/json'
   })
@@ -147,11 +151,13 @@ class Datastore {
   }, options))
 
   createAvatar = (options = {}) => {
-    if (options.data && options.data instanceof File) {
-      const type = options.data.type;
-      options.data = new Blob([options.data], { type });
-      options.dataFormat = type;
+    if (options.data) {
+      options.dataFormat = options.data.type;
+      if (options.data instanceof File) {
+        options.data = new Blob([options.data], { type: options.dataFormat });
+      }
     }
+    options.published = true;
     return this.createProtocolRecord('profile', 'avatar', options)
   }
 

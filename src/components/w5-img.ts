@@ -25,7 +25,7 @@ export class W5Image extends LitElement {
         object-position: center;
         border: none;
         opacity: 0;
-        transition: opacity 0.3s ease;
+        transition: opacity 0.5s ease;
       }
 
       [part="image"][loaded] {
