@@ -119,7 +119,8 @@ export class PageSettings extends LitElement {
       if (blob) {
         if (this.avatarRecord) await this.avatarRecord.delete();
         this.avatarRecord = await datastore.createAvatar({ data: blob });
-        await this.avatarRecord.send(userDID);
+        const { status } = await this.avatarRecord.send(userDID);
+        console.log(status);
       }
       else if (this.avatarRecord) {
         console.log(this.avatarRecord.read);
@@ -147,7 +148,8 @@ export class PageSettings extends LitElement {
     try {
       await this.socialRecord.update({ data: this.socialData });
       const { status } = await this.socialRecord.send(userDID)
-      console.log(status);
+      console.log('send', status, this.socialRecord);
+
       notify.success('Your profile info was saved')
     }
     catch(e) {

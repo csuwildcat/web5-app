@@ -17,6 +17,8 @@ class Datastore {
         }
       }
     });
+
+    console.log(response.protocols);
     if (response.protocols.length) {
       console.log('existing');
       return true;
@@ -26,6 +28,7 @@ class Datastore {
       try {
         await Promise.all(
           Object.values(protocols).map(async _protocol => {
+
             const { protocol } = await this.dwn.protocols.configure({
               message: {
                 definition: _protocol.definition
@@ -92,9 +95,10 @@ class Datastore {
     if (options.from) params.from = options.from;
     if (options.data) params.data = options.data;
     if (options.dataFormat) params.message.dataFormat = options.dataFormat;
-    if (options.published) params.message.published = true;
+    if ('published' in options) params.message.published = options.published;
+    console.log(params);
     const { record } = await this.dwn.records.create(params);
-    record.send(this.did).then(e => {
+    await record.send(this.did).then(e => {
       console.log(e)
     }).catch(e => {
       console.log(e)
