@@ -123,9 +123,8 @@ export class PageSettings extends LitElement {
         console.log(status);
       }
       else if (this.avatarRecord) {
-        console.log(this.avatarRecord.read);
-        // blob = await this.avatarRecord.data.blob(); // BUG due to 'protocol property undefined' error
-        blob = await (await datastore.readAvatar(this.avatarRecord.id))?.data?.blob(); // WORKAROUND with a forced read
+        console.log('avatar', this.avatarRecord);
+        blob = await this.avatarRecord.data.blob();
       }
     }
     catch(e) {

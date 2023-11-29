@@ -6,7 +6,7 @@
 
 :host > section {
   margin: 0 auto;
-  padding: 2.5em 2em 2em;
+  padding: 2.5em 2.25em 2em;
   opacity: 0;
   transition: opacity 0.3s ease;
 }
@@ -40,6 +40,18 @@ form[loading] sl-textarea::part(textarea) {
 
 ::part(form-control-help-text) {
   font-size: 0.75em;
+}
+
+[flex] {
+  display: flex;
+}
+
+[flex~="column"] {
+  flex-direction: column;
+}
+
+[flex~="wrap"] {
+  flex-wrap: wrap;
 }
 
 [default-content] {

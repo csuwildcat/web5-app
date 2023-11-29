@@ -8,13 +8,15 @@ export class W5Image extends LitElement {
     css`
 
       :host {
+        --size: 6em;
         position: relative;
         display: flex;
         align-items: center;
         justify-content: center;
         overflow: hidden;
-        width: 5em;
-        height: 5em;
+        width: var(--size);
+        height: var(--size);
+        flex-shrink: 0;
       }
 
       [part="image"] {
@@ -38,6 +40,7 @@ export class W5Image extends LitElement {
         left: 50%;
         margin: 0;
         padding: 0;
+        font-size: 3em;
         z-index: -1;
         transform: translate(-50%, -50%);
       }
@@ -59,11 +62,16 @@ export class W5Image extends LitElement {
   image
 
   set src(val){
+    this._src = val;
     this.removeAttribute('loaded');
     if (this.image) {
       this.image.removeAttribute('loaded');
       this.image.src = val;
     }
+  }
+
+  get src(){
+    return this._src;
   }
 
   loaded(){

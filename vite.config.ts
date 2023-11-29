@@ -47,5 +47,8 @@ export default defineConfig({
         enabled: true
       }
     })
-  ]
+  ],
+  server: {
+    port: 5555
+  }
 })

@@ -18,8 +18,14 @@ import './pages/drafts';
 import './pages/follows';
 import './pages/settings';
 
+import { ProfileCard } from './components/profile-card'
+
 import { Web5 } from '@web5/api';
-const { web5, did: userDID } = await Web5.connect();
+const { web5, did: userDID } = await Web5.connect({
+  techPreview: {
+    dwnEndpoints: ['http://localhost:3000']
+  }
+});
 console.log(userDID);
 globalThis.userDID = userDID
 
@@ -30,6 +36,17 @@ const datastore = globalThis.datastore = new Datastore({
 })
 
 const BASE_URL: string = (import.meta.env.BASE_URL).length > 2 ? (import.meta.env.BASE_URL).slice(1, -1) : (import.meta.env.BASE_URL);
+
+document.addEventListener('follow-change', e => {
+  const did = e.detail.did;
+  ProfileCard.instances.some(instance => {
+    if (instance.did === did) {
+      instance.following = e.detail.following;
+      notify.success(e.detail.following ? 'Follow added' : 'Follow removed');
+      return true;
+    }
+  });
+})
 
 @customElement('app-container')
 export class AppContainer extends LitElement {

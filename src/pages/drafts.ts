@@ -151,6 +151,10 @@ export class PageDrafts extends LitElement {
         published: true
       });
 
+      const {status} = await this.unconfirmedPost.send(userDID);
+
+      console.log(status);
+
       this.drafts.delete(this.unconfirmedPost);
 
       DOM.fireEvent(this, 'post-published', {

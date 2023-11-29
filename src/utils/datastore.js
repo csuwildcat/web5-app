@@ -17,8 +17,6 @@ class Datastore {
         }
       }
     });
-
-    console.log(response.protocols);
     if (response.protocols.length) {
       console.log('existing');
       return true;
@@ -73,6 +71,9 @@ class Datastore {
     if (options.published !== undefined) {
       params.message.filter.published = options.published
     }
+    if (options.recipient !== undefined) {
+      params.message.filter.recipient = options.recipient
+    }
     if (options.sort || options.latestRecord) {
       params.message.dateSort = options.latestRecord ? 'createdDescending' : options.sort;
     }
@@ -95,7 +96,8 @@ class Datastore {
     if (options.from) params.from = options.from;
     if (options.data) params.data = options.data;
     if (options.dataFormat) params.message.dataFormat = options.dataFormat;
-    if ('published' in options) params.message.published = options.published;
+    if (options.published !== undefined) params.message.published = options.published;
+    if (options.recipient) params.message.recipient = options.recipient;
     console.log(params);
     const { record } = await this.dwn.records.create(params);
     await record.send(this.did).then(e => {
@@ -119,7 +121,7 @@ class Datastore {
 
   createPost = (options = {}) => this.createProtocolRecord('dai1y', 'post', {
     data: options.data,
-    dataFormat: 'text/markdown'
+    dataFormat: 'application/json'
   })
 
   async getPost(postId){
@@ -135,9 +137,28 @@ class Datastore {
     return record;
   }
 
-  async readAvatar(id){
+  async readAvatar(did, returnAs){
+    await this.ready;
+    const _record = await this.getAvatar({ from: did }); // remove this after fix to large file auto-reads
+    const { record, status } = await this.dwn.records.read({
+      from: did,
+      message: {
+        filter: {
+          recordId: _record.id
+        }
+      }
+    });
+    if (status.code !== 200) return false;
+    if (!returnAs) return record;
+    const blob = await record.data.blob();
+    if (returnAs === 'blob') return blob;
+    if (returnAs === 'uri') return URL.createObjectURL(blob);
+  }
+
+  async readPost(did, id){
     await this.ready;
     const { record, status } = await this.dwn.records.read({
+      from: did,
       message: {
         filter: {
           recordId: id
@@ -163,6 +184,22 @@ class Datastore {
     }
     options.published = true;
     return this.createProtocolRecord('profile', 'avatar', options)
+  }
+
+  queryFollows = (options = {}) => this.queryProtocolRecords('dai1y', 'follow', options)
+
+  async toggleFollow(did, follow){
+    await datastore.queryFollows({ recipient: did, latestRecord: true }).then(async (record) => {
+      if (record) {
+        if (follow && record.isDeleted) record.update();
+        else if (!follow) record.delete();
+        return record;
+      }
+      else {
+        const { record, status } = await datastore.createProtocolRecord('dai1y', 'follow', { recipient: did, dataFormat: 'application/json' })
+        return record;
+      }
+    })
   }
 
 }

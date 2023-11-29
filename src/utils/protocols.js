@@ -19,11 +19,11 @@ export const dai1y = {
     types: {
       post: {
         schema: dai1ySchemas.post,
-        dataFormats: ['text/markdown']
+        dataFormats: ['application/json']
       },
       image: {
         schema: dai1ySchemas.image,
-        dataFormats: ['image/gif', 'image/x-png', 'image/jpeg']
+        dataFormats: ['image/gif', 'image/png', 'image/jpeg']
       },
       follow: {
         schema: dai1ySchemas.follow,
@@ -38,7 +38,9 @@ export const dai1y = {
       post: {
         image: {}
       },
-      follow: {},
+      follow: {
+        $globalRole: true
+      },
       bookmark: {}
     }
   }
