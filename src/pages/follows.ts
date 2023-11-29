@@ -59,6 +59,18 @@ export class PageFollows extends LitElement {
     this.fetchFollows();
   }
 
+  firstUpdated(){
+    document.addEventListener('follow-change', e => {
+      const did = e.detail.did;
+      const state = e.detail.following;
+      state ? this.follows.add(did) : this.follows.delete(did)
+      if (did === this.profileModalDid) {
+        this.profileModalExistingFollow = state;
+        this.requestUpdate();
+      }
+    })
+  }
+
   search(value){
     if (value?.match(/^did:/)) this.searchDid()
     else this.searchFollows()
@@ -66,10 +78,7 @@ export class PageFollows extends LitElement {
 
   async searchDid (did){
     did = (did || this.searchInput?.value)?.trim();
-    if (this.profileModalDid === did) {
-      if (!this.profileModal.open) this.profileModal.show()
-    }
-    else {
+    if (did !== this.profileModalDid) {
       this.profileModalDid = did;
       this.profileCard.did = did;
       const record = await datastore.queryFollows({ recipient: did, latestRecord: true })
@@ -77,8 +86,8 @@ export class PageFollows extends LitElement {
         this.profileModalExistingFollow = record?.isDeleted === false;
         this.requestUpdate()
       }
-      this.profileModal.show();
     }
+    this.profileModal.show();
   }
 
   async fetchFollows(cursor){
@@ -92,23 +101,24 @@ export class PageFollows extends LitElement {
     console.log('searchFollows', query)
   }
 
-  async toggleFollow (did, follow){
-    await datastore.toggleFollow(did, follow);
-    if (did === this.profileModalDid) {
-      this.profileModalExistingFollow = follow;
-      this.requestUpdate();
-    }
+  async toggleFollow (did){
+    const state = !this.profileModalExistingFollow;
+    await datastore.toggleFollow(did, state);
+    state ? this.follows.add(did) : this.follows.delete(did)
     DOM.fireEvent(document, 'follow-change', {
       composed: true,
       detail: {
         did: did,
-        following: follow
+        following: state
       }
     });
+    this.requestUpdate();
+    notify.success(state ? 'Follow added' : 'Follow removed');
     this.profileModal.hide();
   }
 
   render() {
+    console.log(this.follows);
     return html`
       <header id="view_header">
         <div id="view_actions">
@@ -127,8 +137,8 @@ export class PageFollows extends LitElement {
         }</div>
       </section>
       <sl-dialog id="modal_profile" no-header>
-        <profile-card id="modal_profile_card"></profile-card>
-        <sl-button slot="footer" variant="success" @click="${e => this.toggleFollow(this.profileModalDid, !this.profileModalExistingFollow)}">${ this.profileModalExistingFollow ? 'Unfollow' : 'Follow' }</sl-button>
+        <profile-card id="modal_profile_card" following="${ifDefined(this.profileModalExistingFollow)}"></profile-card>
+        <sl-button slot="footer" variant="success" @click="${e => this.toggleFollow(this.profileModalDid)}">${ this.profileModalExistingFollow ? 'Unfollow' : 'Follow' }</sl-button>
         <sl-button slot="footer" variant="danger" @click="${e => this.profileModal.hide()}">Close</sl-button>
       </sl-dialog>
     `;

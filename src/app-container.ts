@@ -6,7 +6,7 @@ import { AppRouter } from './components/router';
 import './styles/global.css';
 import './components/global.js';
 import './styles/theme.js';
-import './utils/helpers';
+import { DOM, notify } from './utils/helpers';
 
 import '@vaadin/app-layout/theme/lumo/vaadin-app-layout.js';
 import '@vaadin/app-layout/theme/lumo/vaadin-drawer-toggle.js';
@@ -39,13 +39,13 @@ const BASE_URL: string = (import.meta.env.BASE_URL).length > 2 ? (import.meta.en
 
 document.addEventListener('follow-change', e => {
   const did = e.detail.did;
-  ProfileCard.instances.some(instance => {
+  const following = e.detail.following;
+  console.log(did);
+  for (const instance of ProfileCard.instances) {
     if (instance.did === did) {
-      instance.following = e.detail.following;
-      notify.success(e.detail.following ? 'Follow added' : 'Follow removed');
-      return true;
+      instance.following = following;
     }
-  });
+  }
 })
 
 @customElement('app-container')

@@ -103,7 +103,7 @@ export class ProfileCard extends LitElement {
     }
   };
 
-  static instances = [];
+  static instances = new Set();
 
   constructor() {
     super();
@@ -111,16 +111,16 @@ export class ProfileCard extends LitElement {
 
   connectedCallback(){
     super.connectedCallback();
-    ProfileCard.instances.push(this);
+    ProfileCard.instances.add(this);
   }
 
   disconnectedCallback(){
     super.disconnectedCallback();
-    const index = ProfileCard.instances.indexOf(this)
-    ProfileCard.instances.splice(index, 1);
+    ProfileCard.instances.delete(this)
   }
 
   set did(did){
+    this._did = did;
     this.loading = true;
     Promise.all([
       datastore.readAvatar(did, 'uri').then(async uri => {
@@ -130,7 +130,7 @@ export class ProfileCard extends LitElement {
         this.socialData = await record.data.json() || {};
       })
     ]).then(() => {
-      if (this.getAttribute('did') === did) this.requestUpdate();
+      if (this._did === did) this.requestUpdate();
       this.loading = false;
     }).catch(e => {
       this.loading = false;
@@ -138,13 +138,13 @@ export class ProfileCard extends LitElement {
   }
 
   get did(){
-    return this.getAttribute('did');
+    return this._did;
   }
 
   set following(val){
     const state = !!val;
     this._following = state;
-    if (!state && this.removeUnfollowed) this.remove();
+    if (state === false && this.removeUnfollowed) this.remove();
   }
 
   get following(){
@@ -158,7 +158,6 @@ export class ProfileCard extends LitElement {
     if (did === this.did) {
       this.following = state;
     }
-
     DOM.fireEvent(document, 'follow-change', {
       composed: true,
       detail: {
@@ -166,6 +165,7 @@ export class ProfileCard extends LitElement {
         following: state
       }
     });
+    notify.success(state ? 'Follow added' : 'Follow removed');
   }
 
   render() {
