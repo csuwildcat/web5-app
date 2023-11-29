@@ -112,9 +112,9 @@ export class PageFollows extends LitElement {
         following: state
       }
     });
-    this.requestUpdate();
     notify.success(state ? 'Follow added' : 'Follow removed');
     this.profileModal.hide();
+    this.requestUpdate();
   }
 
   render() {
