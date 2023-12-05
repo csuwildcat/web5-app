@@ -13,7 +13,7 @@ import '@vaadin/app-layout/theme/lumo/vaadin-drawer-toggle.js';
 import '@vaadin/tabs/theme/lumo/vaadin-tabs.js';
 
 import './pages/home';
-import './pages/feed';
+import './pages/posts';
 import './pages/drafts';
 import './pages/follows';
 import './pages/settings';
@@ -256,8 +256,8 @@ export class AppContainer extends LitElement {
           component: '#home'
         },
         {
-          path: '/feed',
-          component: '#feed'
+          path: '/posts',
+          component: '#posts'
         },
         {
           path: '/drafts',
@@ -307,9 +307,9 @@ export class AppContainer extends LitElement {
             </a>
           </vaadin-tab>
           <vaadin-tab>
-            <a tabindex="-1" href="/feed">
+            <a tabindex="-1" href="/posts">
               <sl-icon name="file-earmark-richtext"></sl-icon>
-              <span>My Feed</span>
+              <span>My Posts</span>
             </a>
           </vaadin-tab>
           <vaadin-tab>
@@ -334,7 +334,7 @@ export class AppContainer extends LitElement {
 
         <main id="pages">
           <page-home id="home" scroll></page-home>
-          <page-feed id="feed" scroll></page-feed>
+          <page-posts id="posts" scroll></page-posts>
           <page-drafts id="drafts" scroll></page-drafts>
           <page-follows id="follows" scroll></page-follows>
           <page-settings id="settings" scroll></page-settings>

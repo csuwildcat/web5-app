@@ -7,8 +7,8 @@ import * as markdown from  '../utils/markdown.js';
 
 import '../components/feed-view';
 
-@customElement('page-feed')
-export class PageFeed extends LitElement {
+@customElement('page-posts')
+export class PagePosts extends LitElement {
   static styles = [
     unsafeCSS(PageStyles),
     markdown.styles,
