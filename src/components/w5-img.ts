@@ -8,7 +8,7 @@ export class W5Image extends LitElement {
     css`
 
       :host {
-        --size: 6em;
+        --size: 6rem;
         position: relative;
         display: flex;
         align-items: center;
@@ -19,8 +19,9 @@ export class W5Image extends LitElement {
         flex-shrink: 0;
       }
 
-      [part="image"] {
+      #image {
         display: block;
+        box-sizing: border-box;
         width: 100%;
         height: 100%;
         object-fit: cover;
@@ -30,7 +31,7 @@ export class W5Image extends LitElement {
         transition: opacity 0.5s ease;
       }
 
-      [part="image"][loaded] {
+      #image[loaded] {
         opacity: 1;
       }
 
@@ -40,7 +41,7 @@ export class W5Image extends LitElement {
         left: 50%;
         margin: 0;
         padding: 0;
-        font-size: 3em;
+        font-size: 3rem;
         z-index: -1;
         transform: translate(-50%, -50%);
       }

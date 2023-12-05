@@ -40,12 +40,26 @@ const BASE_URL: string = (import.meta.env.BASE_URL).length > 2 ? (import.meta.en
 document.addEventListener('follow-change', e => {
   const did = e.detail.did;
   const following = e.detail.following;
-  console.log(did);
   for (const instance of ProfileCard.instances) {
     if (instance.did === did) {
       instance.following = following;
     }
   }
+})
+
+document.addEventListener('profile-card-popup', e => {
+  const anchor = e.detail.anchor;
+  const popup = document.querySelector('#app_container ').profileCardPopup
+  const card = popup.querySelector('profile-card');
+
+  anchor.addEventListener('pointerleave', e => {
+    popup.active = false
+  }, { once: true })
+
+  card.did = e.detail.did;
+  popup.reposition();
+  popup.anchor = e.detail.anchor;
+  popup.active = true;
 })
 
 @customElement('app-container')
@@ -148,6 +162,25 @@ export class AppContainer extends LitElement {
         z-index: 2;
       }
 
+      #profile_card_popup {
+        min-width: 300px;
+        max-width: 400px;
+      }
+
+      #profile_card_popup::part(popup) {
+        padding: 0.75rem;
+        border: 1px solid rgb(30 30 30 / 90%);
+        border-top-color: rgb(33 33 33 / 90%);
+        border-bottom-color: rgb(25 25 25 / 90%);
+        border-radius: 0.25rem;
+        background: rgb(20 20 20 / 92%);
+        backdrop-filter: blur(6px);
+        -webkit-backdrop-filter: blur(6px);
+        box-shadow: 0 2px 10px -2px rgba(0,0,0,0.75);
+        /* opacity: 0;
+        transition: opacity 0.3s ease; */
+      }
+
       @media(max-width: 500px) {
         #editor {
           --modal-height: 100%;
@@ -201,6 +234,12 @@ export class AppContainer extends LitElement {
     `;
   }
 
+  @query('#editor', true)
+  editor;
+
+  @query('#profile_card_popup', true)
+  profileCardPopup;
+
   constructor() {
     super();
 
@@ -237,9 +276,6 @@ export class AppContainer extends LitElement {
 
     this.addEventListener('open-editor', e => this.openEditor(e.detail.record))
   }
-
-  @query('#editor')
-  editor;
 
   firstUpdated() {
     this.nav = this.renderRoot.querySelector('#global_nav');
@@ -307,6 +343,12 @@ export class AppContainer extends LitElement {
       </vaadin-app-layout>
 
       <post-editor id="editor"></post-editor>
+
+      <sl-popup id="profile_card_popup" placement="bottom-start" flip
+        @pointerenter="${ e => e.currentTarget.active = true }"
+        @pointerleave="${ e => e.currentTarget.active = false }">
+        <profile-card id="profile_card_popup"></profile-card>
+      </sl-popup>
 
     `;
   }

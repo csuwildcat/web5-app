@@ -30,7 +30,7 @@ export class PageSettings extends LitElement {
         width: 7em;
         height: 7em;
         border: 2px dashed rgba(200, 200, 230, 0.5);
-        border-radius: 8px;
+        border-radius: 6px;
       }
 
       #profile_image[loaded] {
@@ -84,12 +84,12 @@ export class PageSettings extends LitElement {
   @query('#profile_image_input', true)
   avatarInput;
 
-  @property()
-  socialData = {
-    displayName: '',
-    bio: '',
-    apps: {}
+  static properties = {
+    socialData: {
+      type: Object
+    }
   }
+
   socialRecord: any;
   avatarDataUri: any;
   avatarRecord: any;
@@ -97,11 +97,16 @@ export class PageSettings extends LitElement {
   constructor() {
     super();
     this.initialize();
+    this.socialData = {
+      displayName: '',
+      bio: '',
+      apps: {}
+    }
   }
 
   async initialize(){
     this.socialRecord = await datastore.getSocial() || await datastore.createSocial({ data: this.socialData });
-    this.socialData = await this.socialRecord?.data?.json?.() || this.socialData;
+    this.socialData = await this.socialRecord.cache.json || this.socialData;
     console.log(this.socialRecord);
 
     await this.setAvatar(null, false);

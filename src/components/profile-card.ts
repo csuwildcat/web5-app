@@ -14,14 +14,44 @@ export class ProfileCard extends LitElement {
 
       :host {
         display: flex;
-        gap: 1rem;
         max-width: 600px;
+        cursor: default;
+      }
+
+        :host([minimal]) {
+          align-items: center
+        }
+
+        :host([vertical]) {
+          flex-direction: column;
+        }
+
+      slot[name="start"]:not(:slotted) {
+        display: none;
       }
 
       w5-img {
+        margin: 0 1rem 0 0;
         border: 2px solid rgba(200, 200, 230, 0.5);
-        border-radius: 0.2em;
+        border-radius: 0.2rem;
       }
+
+        :host([vertical]) w5-img {
+          --size: 5rem;
+          margin: 0 0 0.5rem;
+        }
+
+        :host([minimal]) w5-img {
+          --size: 2.5rem;
+          border-width: 1px;
+        }
+
+        :host([minimal]) w5-img::part(fallback) {
+          font-size: 2rem;
+        }
+
+
+
 
       #content {
         flex: 1;
@@ -37,11 +67,11 @@ export class ProfileCard extends LitElement {
       }
 
       h3 {
-        margin: 0 0 0.5em 0;
+        margin: 0;
       }
 
       p {
-        margin: 0;
+        margin: 0.5em 0 0;
       }
 
       #content_skeleton {
@@ -57,10 +87,19 @@ export class ProfileCard extends LitElement {
         display: block;
       }
 
+      slot[name="content-bottom"] {
+        margin: 0.5em 0 0;
+      }
+
       sl-skeleton:nth-of-type(1) {
         width: 40%;
         margin: 0 0 1em;
       }
+
+        :host([vertical]) sl-skeleton:nth-of-type(1) {
+          width: 100%;
+        }
+
       sl-skeleton:nth-of-type(2) {
         width: 100%;
         margin: 0 0 0.4em;
@@ -75,6 +114,10 @@ export class ProfileCard extends LitElement {
         width: 80%;
         margin: 0 0 0.4em;
       }
+
+      :host([minimal]) sl-skeleton:first-child ~ sl-skeleton {
+        display: none;
+      }
     `
   ]
 
@@ -85,6 +128,14 @@ export class ProfileCard extends LitElement {
     },
     did: {
       type: String,
+      reflect: true
+    },
+    minimal: {
+      type: Boolean,
+      reflect: true
+    },
+    vertical: {
+      type: Boolean,
       reflect: true
     },
     following: {
@@ -120,14 +171,15 @@ export class ProfileCard extends LitElement {
   }
 
   set did(did){
+    if (this._did === did) return;
     this._did = did;
     this.loading = true;
     Promise.all([
-      datastore.readAvatar(did, 'uri').then(async uri => {
-        this.avatarDataUri = uri || undefined;
+      datastore.readAvatar(did).then(async record => {
+        this.avatarDataUri = record.cache.uri || undefined;
       }),
       datastore.getSocial({ from: did }).then(async record => {
-        this.socialData = await record.data.json() || {};
+        this.socialData = await record.cache.json || {};
       })
     ]).then(() => {
       if (this._did === did) this.requestUpdate();
@@ -170,22 +222,28 @@ export class ProfileCard extends LitElement {
 
   render() {
     return html`
-      <w5-img src="${ ifDefined(this.avatarDataUri) }" fallback="person"></w5-img>
+      <slot name="start"></slot>
+      <w5-img part="image" src="${ ifDefined(this.avatarDataUri) }" fallback="person"></w5-img>
       <div id="content">
-        <h3>${this?.socialData?.displayName || 'Anon'}</h3>
-        <p>${this?.socialData?.bio || ''}</p>
+        <h3 part="name">${this?.socialData?.displayName || 'Anon'}</h3>
+        ${ !this.minimal && this?.socialData?.bio ? html`<p>${this.socialData.bio}</p>` : nothing }
         <div id="content_skeleton">
           <sl-skeleton effect="sheen"></sl-skeleton>
           <sl-skeleton effect="sheen"></sl-skeleton>
           <sl-skeleton effect="sheen"></sl-skeleton>
           <sl-skeleton effect="sheen"></sl-skeleton>
         </div>
+        <slot name="content-bottom"></slot>
       </div>
-      ${
-        this.followButton ?
-          html`<sl-button id="follow_button" variant="${this.following ? 'default' : 'primary' }" @click="${e => this.toggleFollow()}">${this.following ? 'Unfollow' : 'Follow' }</sl-button>` :
-          nothing
-      }
+      <slot name="after-content"></slot>
+      <div>
+        ${
+          this.followButton ?
+            html`<sl-button id="follow_button" size="small" variant="${this.following ? 'default' : 'primary' }" @click="${e => this.toggleFollow()}">${this.following ? 'Unfollow' : 'Follow' }</sl-button>` :
+            nothing
+        }
+      </div>
+      <slot name="end"></slot>
     `;
   }
 }

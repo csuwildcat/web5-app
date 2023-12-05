@@ -46,12 +46,36 @@ form[loading] sl-textarea::part(textarea) {
   display: flex;
 }
 
+[flex~="center-x"]:not([flex~="column"]) {
+  justify-content: center;
+}
+
+[flex~="center-x"][flex~="column"] {
+  align-items: center;
+}
+
+[flex~="center-y"]:not([flex~="column"]) {
+  align-items: center;
+}
+
+[flex~="center-y"][flex~="column"] {
+  justify-content: center;
+}
+
 [flex~="column"] {
   flex-direction: column;
 }
 
 [flex~="wrap"] {
   flex-wrap: wrap;
+}
+
+[flex~="fit"] {
+  flex: 0;
+}
+
+[flex~="expand"] {
+  flex: 1;
 }
 
 [default-content] {

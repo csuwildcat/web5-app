@@ -11,12 +11,7 @@ import PageStyles from  '../styles/page.css';
 import { DOM } from '../utils/helpers.js';
 import './global.js'
 
-const timeOfDayMap = {
-  sunrise: 'brightness-alt-high',
-  day: 'brightness-high',
-  sunset: 'brightness-alt-low',
-  night: 'moon'
-}
+import '../components/post-view'
 
 export interface PostEditor {
   record?: any
@@ -36,6 +31,7 @@ export class FeedView extends LitElement {
         --modal-width: calc(100% - var(--sl-spacing-4x-large));
         --modal-height: calc(100% - var(--sl-spacing-4x-large));
         --modal-border-radius: 0.25rem;
+        display: block;
       }
 
       :host > header {
@@ -49,50 +45,16 @@ export class FeedView extends LitElement {
         justify-content: flex-end;
       }
 
-      .post {
-        max-width: 600px;
+      post-view {
+        margin: 0 0 2em;
+        padding: 0 0 2em;
+        border-bottom: 1px solid rgba(255,255,255,0.25);
       }
 
       .date {
         display: flex;
-        margin-right: 3em;
+        flex-direction: column;
         text-align: center;
-      }
-
-      .date sl-icon {
-        font-size: 1.6em;
-        margin: 0 0.25em 0 0;
-        padding: 0.25em;
-        border-radius: 100%;
-        border: 2px solid rgba(255,255,255,0.25)
-      }
-
-        .date sl-icon[segment="sunrise"] {
-          color: yellow;
-          background: rgb(105 171 231);
-        }
-
-        .date sl-icon[segment="day"] {
-          color: yellow;
-          background: #0087ff;
-        }
-
-        .date sl-icon[segment="sunset"] {
-          color: rgb(223 101 0);
-          background: rgb(255 213 118);
-        }
-
-        .date sl-icon[segment="night"] {
-          background: #0a007d;
-        }
-
-      .date .formatted {
-
-      }
-
-      .post .markdown-body {
-        flex: 1;
-        background: none;
       }
 
     `
@@ -189,95 +151,29 @@ export class FeedView extends LitElement {
     }
   }
 
-  parseDate(utc = ''){
-    const date = new Date(utc);
-    const formatted = new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'short', day: 'numeric' }).format(date);
-    let hours = date.getUTCHours();
-    let segment;
-
-    if (hours >= 5 && hours < 8) {
-      segment = 'sunrise';
-    }
-    else if (hours >= 8 && hours < 18) {
-      segment = 'day';
-    }
-    else if (hours >= 18 && hours < 20) {
-      segment = 'sunset';
-    }
-    else {
-      segment = 'night';
-    }
-
-    let ampm = hours >= 12 ? 'PM' : 'AM';
-        hours = hours % 12 || 12;
-    let minutes = date.getUTCMinutes();
-        minutes = minutes < 10 ? '0' + minutes : minutes;
-
-
-    return {
-      date,
-      segment,
-      formatted,
-      time: `${hours}:${minutes} ${ampm}`
-    }
+  openEditor(record){
+    DOM.fireEvent(this, 'open-editor', {
+      composed: true,
+      detail: {
+        record: record
+      }
+    })
   }
 
   render() {
     let lastDate;
     return html`
-      <div id="posts" placehold>${
+      <div id="posts" part="posts" placehold>${
         Array.from(this.posts || [], post => {
-          const date = this.parseDate(post.datePublished);
-          if (date.formatted === lastDate) return nothing;
-          lastDate = date.formatted;
-          let segment = 'night';
-          return html`
-            <div class="post">
-
-              <div class="date">
-                <sl-icon segment="${segment}" name="${timeOfDayMap[segment]}"></sl-icon>
-                <div>
-                  <div class="formatted">${date.formatted}</div>
-                  <div class="time">${date.time}</div>
-                </div>
-              </div>
-
-                <!-- <img
-                  slot="image"
-                  src="https://images.unsplash.com/photo-1559209172-0ff8f6d49ff7?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=80"
-                /> -->
-
-                ${markdown.render(post.json.markdown)}
-
-
-                ${
-                  // this.ownDid
-                  false ?
-                    html`
-                      <div slot="footer">
-                        <sl-button variant="success" size="small" outline @click="${e => this.openEditor(post)}">
-                          <sl-icon slot="prefix" name="pencil"></sl-icon>
-                          Edit
-                        </sl-button>
-                        <sl-button variant="primary" size="small" outline @click="${e => this.confirmUnpublish(post)}">
-                          <sl-icon slot="prefix" name="send"></sl-icon>
-                          Unpublish
-                        </sl-button>
-                        <sl-button class="delete-button" variant="danger" size="small" outline @click="${e => this.deletePost(post)}">
-                          <sl-icon slot="prefix" name="x-lg"></sl-icon>
-                          Delete
-                        </sl-button>
-                      </div>
-                    ` : nothing
-                }
-            </div>
-          `
-      })}
-      <div default-content="firstrun clickable" @click="${e => globalThis.router.navigateTo('/drafts')}">
-        <sl-icon name="file-earmark-plus"></sl-icon>
-        You haven't published any posts. Click here to switch to the drafts area, where you can create or publish one.
+          // if (date.formatted === lastDate) return nothing;
+          // lastDate = date.formatted;
+          return html`<post-view part="post" exportparts="markdown" .post=${post}></post-view>`
+        })}
+        <div default-content="firstrun clickable" @click="${e => globalThis.router.navigateTo('/drafts')}">
+          <sl-icon name="file-earmark-plus"></sl-icon>
+          You haven't published any posts. Click here to switch to the drafts area, where you can create or publish one.
+        </div>
       </div>
-    </div>
       <sl-dialog id="modal_unpublish_confirm" class="dialog-deny-close" no-header @sl-hide="${ e => this.unconfirmedPost = null }">
         Are you sure you want to publish?
         <sl-button slot="footer" variant="success" @click="${e => this.unpublishPost()}">Confirm</sl-button>

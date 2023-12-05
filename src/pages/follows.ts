@@ -31,7 +31,7 @@ export class PageFollows extends LitElement {
     #modal_profile_image {
       --size: 7em;
       border: 2px solid rgba(200, 200, 230, 0.5);
-      border-radius: 8px;
+      border-radius: 6px;
     }
 
     #modal_profile p {

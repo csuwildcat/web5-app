@@ -1,7 +1,18 @@
 
 import { toWebStream } from "./streams";
 import * as protocols from './protocols';
+
+setInterval(() => Datastore.cache = {}, 1000 * 60 * 60)
+
 class Datastore {
+
+  static cache = {}
+  static setCache(did, key, value){
+    (Datastore.cache[did] || (Datastore.cache[did] = {}))[key] = value;
+  }
+  static getCache(did, key){
+    return Datastore.cache?.[did]?.[key];
+  }
 
   constructor(options){
     this.did = options.did;
@@ -109,15 +120,35 @@ class Datastore {
     return record;
   }
 
-  getSocial = (options = {}) => this.queryProtocolRecords('profile', 'social', Object.assign({
-    latestRecord: true
-  }, options))
+  async getSocial(options = {}) {
+    await this.ready;
+    const did = options.from || this.did;
+    if (did !== this.did) {
+      const cached = Datastore.getCache(did, 'social');
+      if (cached) return cached;
+    }
+    const record = await this.queryProtocolRecords('profile', 'social', Object.assign({
+      latestRecord: true
+    }, options))
+    if (!record) return;
+    record.cache = {
+      json: await record.data.json()
+    }
+    Datastore.setCache(did, 'social', record);
+    return record;
+  }
 
-  createSocial = (options = {}) => this.createProtocolRecord('profile', 'social', {
-    published: true,
-    data: options.data,
-    dataFormat: 'application/json'
-  })
+  async createSocial(options = {}) {
+    const record = await this.createProtocolRecord('profile', 'social', {
+      published: true,
+      data: options.data,
+      dataFormat: 'application/json'
+    })
+    record.cache = {
+      json: await record.data.json()
+    }
+    return record;
+  }
 
   createPost = (options = {}) => this.createProtocolRecord('dai1y', 'post', {
     data: options.data,
@@ -139,6 +170,10 @@ class Datastore {
 
   async readAvatar(did, returnAs){
     await this.ready;
+    if (did !== this.did) {
+      const cached = Datastore.getCache(did, 'avatar');
+      if (cached) return cached;
+    }
     const _record = await this.getAvatar({ from: did }); // remove this after fix to large file auto-reads
     const { record, status } = await this.dwn.records.read({
       from: did,
@@ -149,10 +184,13 @@ class Datastore {
       }
     });
     if (status.code !== 200) return false;
-    if (!returnAs) return record;
     const blob = await record.data.blob();
-    if (returnAs === 'blob') return blob;
-    if (returnAs === 'uri') return URL.createObjectURL(blob);
+    record.cache = {
+      blob: blob,
+      uri: URL.createObjectURL(blob)
+    }
+    if (did !== this.did) Datastore.setCache(did, 'avatar', record);
+    return record;
   }
 
   async readPost(did, id){

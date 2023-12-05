@@ -32,6 +32,7 @@
     "@web5/api": "0.8.3-alpha-20231120-3c62a78",
     "buffer": "^6.0.3",
     "bytemd": "^1.21.0",
+    "esbuild": "^0.19.8",
     "github-markdown-css": "^5.3.0",
     "highlight.js": "^11.9.0",
     "katex": "^0.16.9",

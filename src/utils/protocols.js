@@ -36,7 +36,15 @@ export const dai1y = {
     },
     structure: {
       post: {
-        image: {}
+        image: {},
+        comment: {
+          $actions: [
+            {
+              role: 'follow',
+              can: 'write'
+            }
+          ]
+        }
       },
       follow: {
         $globalRole: true

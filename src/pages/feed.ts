@@ -13,7 +13,22 @@ export class PageFeed extends LitElement {
     unsafeCSS(PageStyles),
     markdown.styles,
     css`
+      :host > section {
+        padding: 0;
+      }
 
+      feed-view::part(posts) {
+        padding: 2em;
+      }
+
+      @media(max-width: 500px) {
+        feed-view::part(posts) {
+          padding: 0;
+        }
+        feed-view::part(markdown) {
+          padding-right: 1.25em;
+        }
+      }
     `
   ]
 

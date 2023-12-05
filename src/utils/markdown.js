@@ -23,6 +23,7 @@ export const styles = css`${unsafeCSS([
   `
     .markdown-body {
       font-family: unset;
+      background: none;
     }
   `
 ].join(''))}`
@@ -47,5 +48,5 @@ export function render(markdown){
       plugins: plugins
     }
   })
-  return unsafeHTML(div.innerHTML);
+  return unsafeHTML(div.firstElementChild.innerHTML);
 }
