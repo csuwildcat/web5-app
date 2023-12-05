@@ -48,7 +48,7 @@ export class FeedView extends LitElement {
       post-view {
         margin: 0 0 2em;
         padding: 0 0 2em;
-        border-bottom: 1px solid rgba(255,255,255,0.25);
+        border-bottom: 1px solid rgba(255,255,255,0.05);
       }
 
       .date {
