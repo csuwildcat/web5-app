@@ -5,14 +5,13 @@ import { customElement, query, property } from 'lit/decorators.js';
 import { DOM, notify } from '../utils/helpers.js';
 
 import PageStyles from  '../styles/page.css';
-import * as markdown from  '../utils/markdown.js';
 import '../components/post-editor';
+import '../components/markdown-content'
 
 @customElement('page-drafts')
 export class PageDrafts extends LitElement {
   static styles = [
     unsafeCSS(PageStyles),
-    markdown.styles,
     css`
 
       :host {
@@ -214,7 +213,7 @@ export class PageDrafts extends LitElement {
                   slot="image"
                   src="https://images.unsplash.com/photo-1559209172-0ff8f6d49ff7?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=80"
                 /> -->
-                ${markdown.render(post.json.markdown || 'New Draft')}
+                <markdown-content part="markdown" .data=${post.json.markdown}></markdown-content>
                 <!-- <small>Created: ${new Date(post.dateCreated).toLocaleDateString()}</small> -->
 
                 <div slot="footer">

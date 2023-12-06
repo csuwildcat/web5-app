@@ -42,12 +42,12 @@ export class ProfileCard extends LitElement {
         }
 
         :host([minimal]) w5-img {
-          --size: 2.5rem;
+          --size: 2rem;
           border-width: 1px;
         }
 
         :host([minimal]) w5-img::part(fallback) {
-          font-size: 2rem;
+          font-size: 1.5rem;
         }
 
 

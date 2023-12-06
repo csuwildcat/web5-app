@@ -65,7 +65,7 @@ export class PostView extends LitElement {
       #header {
         position: sticky;
         top: 0;
-        height: 4rem;
+        height: 3.5rem;
         margin: 0 0 1rem;
         padding: 0 0.75rem;
         background: rgb(24 24 24 / 80%);;
@@ -87,7 +87,7 @@ export class PostView extends LitElement {
       }
 
       #header profile-card::part(name) {
-        margin: 0 0.5rem 0.25rem 0;
+        margin: 0 0.75rem 0.25rem 0;
         text-wrap: nowrap;
       }
 
@@ -106,7 +106,7 @@ export class PostView extends LitElement {
       #actions {
         position: sticky;
         top: 4.25rem;
-        min-width: 4.125rem;
+        min-width: 3.625rem;
         height: fit-content;
       }
 
