@@ -118,9 +118,13 @@ export class PageDrafts extends LitElement {
         data: {
           markdown: `# New Post
 
-1. Make
-2. it
-3. count
+\`\`\`mermaid
+graph TD;
+  A-->B;
+  A-->C;
+  B-->D;
+  C-->D;
+\`\`\`
 `
         }
       });

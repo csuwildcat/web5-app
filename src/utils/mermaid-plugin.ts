@@ -211,9 +211,9 @@ another task      : 24d`,
           const container = document.createElement('div')
           const instanceId = `bytemd-mermaid-${Date.now()}-${i}`;
 
-          container.classList.add('bytemd-mermaid')
+          container.classList.add('bytemd-mermaid', instanceId)
           container.style.lineHeight = 'initial';
-          pre.classList.add(instanceId)
+          container.innerHTML = source;
           pre.replaceWith(container)
 
           m.render(instanceId, source)

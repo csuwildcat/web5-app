@@ -104,7 +104,7 @@ export class PostView extends LitElement {
       #actions {
         position: sticky;
         top: 4.25rem;
-        min-width: 3.625rem;
+        min-width: 3.8rem;
         height: fit-content;
       }
 

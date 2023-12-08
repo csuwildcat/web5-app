@@ -48,5 +48,5 @@ export function render(markdown){
       plugins: plugins
     }
   })
-  return unsafeHTML(div.firstElementChild.innerHTML);
+  return div.firstElementChild;
 }
