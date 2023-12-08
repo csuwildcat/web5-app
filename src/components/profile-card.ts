@@ -22,6 +22,10 @@ export class ProfileCard extends LitElement {
           align-items: center
         }
 
+        :host([minimal]) h3 {
+          font-weight: normal;
+        }
+
         :host([vertical]) {
           flex-direction: column;
         }
@@ -42,7 +46,7 @@ export class ProfileCard extends LitElement {
         }
 
         :host([minimal]) w5-img {
-          --size: 2rem;
+          --size: 2.25rem;
           border-width: 1px;
         }
 
@@ -56,6 +60,7 @@ export class ProfileCard extends LitElement {
       #content {
         flex: 1;
         position: relative;
+        margin: 0 1em 0 0;
       }
 
       :host([loading]) :is(h3, p, sl-button) {
@@ -67,11 +72,13 @@ export class ProfileCard extends LitElement {
       }
 
       h3 {
-        margin: 0;
+        margin: -0.1em 0 0;
+        font-size: 110%;
+        text-wrap: nowrap;
       }
 
       p {
-        margin: 0.5em 0 0;
+        margin: 0.3em 0 0;
       }
 
       #content_skeleton {
@@ -93,7 +100,8 @@ export class ProfileCard extends LitElement {
 
       sl-skeleton:nth-of-type(1) {
         width: 40%;
-        margin: 0 0 1em;
+        min-width: 7em;
+        margin: 0 0 0.2rem;
       }
 
         :host([vertical]) sl-skeleton:nth-of-type(1) {
@@ -102,7 +110,7 @@ export class ProfileCard extends LitElement {
 
       sl-skeleton:nth-of-type(2) {
         width: 100%;
-        margin: 0 0 0.4em;
+        margin: 1em 0 0.4em;
       }
 
       sl-skeleton:nth-of-type(3) {
@@ -226,6 +234,7 @@ export class ProfileCard extends LitElement {
       <w5-img part="image" src="${ ifDefined(this.avatarDataUri) }" fallback="person"></w5-img>
       <div id="content">
         <h3 part="name">${this?.socialData?.displayName || 'Anon'}</h3>
+        <slot name="subtitle"></slot>
         ${ !this.minimal && this?.socialData?.bio ? html`<p>${this.socialData.bio}</p>` : nothing }
         <div id="content_skeleton">
           <sl-skeleton effect="sheen"></sl-skeleton>

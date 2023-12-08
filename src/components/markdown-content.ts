@@ -3,8 +3,6 @@ import { customElement, query, property } from 'lit/decorators.js';
 
 import * as markdown from  '../utils/markdown.js';
 
-import examples from '../utils/example-markdown.js'
-
 import PageStyles from  '../styles/page.css';
 import { DOM } from '../utils/helpers.js';
 import './global.js'

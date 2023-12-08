@@ -83,12 +83,11 @@ export class PostView extends LitElement {
       }
 
       #header profile-card::part(image) {
-        margin: 0 0.75rem 0 0;
+
       }
 
       #header profile-card::part(name) {
-        margin: 0 0.75rem 0.25rem 0;
-        text-wrap: nowrap;
+
       }
 
       #header time {
@@ -98,7 +97,6 @@ export class PostView extends LitElement {
       .date {
         display: flex;
         flex-direction: column;
-        text-align: center;
         font-size: 80%;
         color: #999;
       }
@@ -237,7 +235,7 @@ export class PostView extends LitElement {
               anchor: e.currentTarget
             }
           })}">
-          <time class="date" slot="after-content">${date.formatted} ${date.time}</time>
+          <time class="date" slot="subtitle">${date.formatted} ${date.time}</time>
         </profile-card>
       </header>
 

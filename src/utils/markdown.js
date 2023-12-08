@@ -7,7 +7,7 @@ import gfm from '@bytemd/plugin-gfm'
 import math from '@bytemd/plugin-math'
 import breaks from '@bytemd/plugin-breaks'
 import gemoji from '@bytemd/plugin-gemoji'
-import mermaid from '@bytemd/plugin-mermaid'
+import mermaid from './mermaid-plugin'
 import highlight from '@bytemd/plugin-highlight'
 
 import BaseStyles from 'bytemd/dist/index.css'
@@ -41,7 +41,7 @@ export const plugins = [
 
 export function render(markdown){
   const div = document.createElement('div');
-  const viewer = new Viewer({
+  new Viewer({
     target: div,
     props: {
       value: markdown,
