@@ -42,6 +42,7 @@ export class MarkdownContent extends LitElement {
   render() {
     if (this.data) {
       const content = markdown.render(this.data);
+      this.shadowRoot.innerHTML = '';
       this.shadowRoot.appendChild(content);
     }
   }
