@@ -40,13 +40,9 @@ export class MarkdownContent extends LitElement {
   // }
 
   render() {
-    const wrapper = document.createElement('div');
-    wrapper.classList.add('markdown-body')
-    let content = '';
     if (this.data) {
       const content = markdown.render(this.data);
-      wrapper.appendChild(content);
+      this.shadowRoot.appendChild(content);
     }
-    this.shadowRoot.appendChild(wrapper);
   }
 }
