@@ -128,7 +128,6 @@ export class PageSettings extends LitElement {
         console.log(status);
       }
       else if (this.avatarRecord) {
-        console.log('avatar', this.avatarRecord);
         blob = await this.avatarRecord.data.blob();
       }
     }

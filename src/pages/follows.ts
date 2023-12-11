@@ -118,7 +118,6 @@ export class PageFollows extends LitElement {
   }
 
   render() {
-    console.log(this.follows);
     return html`
       <header id="view_header">
         <div id="view_actions">

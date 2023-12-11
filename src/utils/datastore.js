@@ -174,7 +174,7 @@ class Datastore {
       const cached = Datastore.getCache(did, 'avatar');
       if (cached) return cached;
     }
-    const _record = await this.getAvatar({ from: did }); // remove this after fix to large file auto-reads
+    const _record = await this.getAvatar({ from: did });
     const { record, status } = await this.dwn.records.read({
       from: did,
       message: {
@@ -183,7 +183,6 @@ class Datastore {
         }
       }
     });
-    if (status.code !== 200) return false;
     const blob = await record.data.blob();
     record.cache = {
       blob: blob,

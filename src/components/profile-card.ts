@@ -193,6 +193,7 @@ export class ProfileCard extends LitElement {
       if (this._did === did) this.requestUpdate();
       this.loading = false;
     }).catch(e => {
+      console.log(e);
       this.loading = false;
     })
   }

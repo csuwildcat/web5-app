@@ -29,7 +29,7 @@
     "@vaadin/app-layout": "24.0.4",
     "@vaadin/select": "24.0.4",
     "@vaadin/tabs": "^24.0.4",
-    "@web5/api": "0.8.3",
+    "@web5/api": "@web5/api@0.8.3-alpha-20231209-33f666a",
     "buffer": "^6.0.3",
     "bytemd": "^1.21.0",
     "esbuild": "^0.19.8",
