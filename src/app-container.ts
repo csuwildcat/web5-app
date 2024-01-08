@@ -37,16 +37,6 @@ const datastore = globalThis.datastore = new Datastore({
 
 const BASE_URL: string = (import.meta.env.BASE_URL).length > 2 ? (import.meta.env.BASE_URL).slice(1, -1) : (import.meta.env.BASE_URL);
 
-document.addEventListener('follow-change', e => {
-  const did = e.detail.did;
-  const following = e.detail.following;
-  for (const instance of ProfileCard.instances) {
-    if (instance.did === did) {
-      instance.following = following;
-    }
-  }
-})
-
 document.addEventListener('profile-card-popup', e => {
   const anchor = e.detail.anchor;
   const popup = document.querySelector('#app_container ').profileCardPopup

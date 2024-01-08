@@ -208,6 +208,17 @@ class Datastore {
 
   getPosts = (options = {}) => this.queryProtocolRecords('dai1y', 'post', options)
 
+  getPostsAfter = (options = {}) => {
+    return this.queryProtocolRecords('profile', 'avatar', Object.assign({
+      sort: 'createdDescending',
+      filter: { datePublished: { from: randomDate } },
+    }, options))
+  }
+
+  getPostsBefore(){
+    console.log(follows.entries);
+  }
+
   getAvatar = (options = {}) => this.queryProtocolRecords('profile', 'avatar', Object.assign({
     latestRecord: true
   }, options))
@@ -228,8 +239,16 @@ class Datastore {
   async toggleFollow(did, follow){
     await datastore.queryFollows({ recipient: did, latestRecord: true }).then(async (record) => {
       if (record) {
+        console.log(record);
         if (follow && record.isDeleted) record.update();
-        else if (!follow) record.delete();
+        else if (!follow) {
+          const { record: deleted } = await this.dwn.records.delete({
+            message: {
+              recordId: record.id,
+            }
+          });
+          record = deleted;
+        }
         return record;
       }
       else {
