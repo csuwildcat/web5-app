@@ -10,7 +10,7 @@ export class PageHome extends LitElement {
 
   constructor() {
     super();
-    follows.initialize().then(() => this.getLatestPosts())
+    //follows.initialize().then(() => this.getLatestPosts())
   }
 
   static styles = [

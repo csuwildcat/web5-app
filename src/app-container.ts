@@ -22,9 +22,9 @@ import { ProfileCard } from './components/profile-card'
 
 import { Web5 } from '@web5/api';
 const { web5, did: userDID } = await Web5.connect({
-  // techPreview: {
-  //   dwnEndpoints: ['http://localhost:3000']
-  // }
+  techPreview: {
+    dwnEndpoints: ['http://localhost:3000']
+  }
 });
 console.log(userDID);
 globalThis.userDID = userDID

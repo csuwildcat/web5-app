@@ -174,15 +174,7 @@ class Datastore {
       const cached = Datastore.getCache(did, 'avatar');
       if (cached) return cached;
     }
-    const _record = await this.getAvatar({ from: did });
-    const { record, status } = await this.dwn.records.read({
-      from: did,
-      message: {
-        filter: {
-          recordId: _record.id
-        }
-      }
-    });
+    const record = await this.getAvatar({ from: did });
     const blob = await record.data.blob();
     record.cache = {
       blob: blob,
